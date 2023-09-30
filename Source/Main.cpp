@@ -9,7 +9,7 @@
 
 bool programaDeTeste(char* progFile, MaquinaToken* maquinas, GeradorLALR* sintatico);
 
-int main(int numArgs, char** args)
+extern "C" int mainOld(int numArgs, char** args)
 {
   char* gramFile = args[1];
 
