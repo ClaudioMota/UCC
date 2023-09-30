@@ -1,4 +1,4 @@
-#include "lexer.h"
+#include "parsers/lexer.h"
 
 static int func_identifier(int *estado, int entrada)
 {

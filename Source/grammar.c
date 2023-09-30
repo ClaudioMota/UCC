@@ -1,5 +1,5 @@
 #include "grammar.h"
-#include "lexer.h"
+#include "parsers/lexer.h"
 #include "stdio.h"
 
 int UCC_lexerFunctionsCount = 24;

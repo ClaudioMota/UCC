@@ -12,7 +12,7 @@ TARGET=Linux64
 LINK= -static-libstdc++ -static-libgcc -static
 
 all: build $(C_OBJECTS) $(CPP_OBJECTS)
-	g++ $(C_OBJECTS) $(CPP_OBJECTS) $(LINK) -o build/UCC
+	g++ $(C_OBJECTS) $(CPP_OBJECTS) $(LINK) -o build/ucc
 
 clean:
 	rm -r build
