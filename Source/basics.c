@@ -1,6 +1,7 @@
 #include "basics.h"
 
 #include <stdio.h>
+#include <parsers/lexer.h>
 
 char* readFile(char* path)
 {
@@ -13,4 +14,9 @@ char* readFile(char* path)
   ret[size] = '\0';
   fread(ret, 1, size, file);
   return ret;
+}
+
+bool compilerError(char* message, Token* location)
+{
+  printf("%s %i:%i\n", message, location->line, location->column);
 }

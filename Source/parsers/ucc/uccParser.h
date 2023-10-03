@@ -1,7 +1,9 @@
-#ifndef UCC_PARSER_HEADER_FILE
-#define UCC_PARSER_HEADER_FILE
+#ifndef ucc_PARSER_HEADER_FILE
+#define ucc_PARSER_HEADER_FILE
 #include<parsers/parser.h>
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 enum TokenType
 {
   UNKNOWN = -2,
@@ -31,5 +33,8 @@ enum TokenType
   T_charLiteral,
   T_decimal
 };
-Parser UCC_parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), Token* tokens);
+#ifdef __cplusplus
+}
+#endif
+Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), Token* tokens);
 #endif

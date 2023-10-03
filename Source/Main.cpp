@@ -13,17 +13,13 @@ extern "C" int mainOld(int numArgs, char** args)
 {
   char* gramFile = args[1];
 
-  if(numArgs < 3)
+  if(numArgs < 2)
   {
-    printf("Entrada esperada: <gramatica> <allways-shift> [<diretorio>]\n");
+    printf("Entrada esperada: <gramatica> [<diretorio>]\n");
     return 0;
   }
 
-  bool betterShiftThanReduce = false;
-  if(numArgs >= 3)
-  {
-    betterShiftThanReduce = (strcmp(args[2], "Y") == 0);
-  }
+  bool betterShiftThanReduce = true;
 
   printf("=========== COMPILANDO O COMPILADOR ============\n\n");
   FILE* gramatica = fopen(gramFile, "rb");
@@ -52,8 +48,8 @@ extern "C" int mainOld(int numArgs, char** args)
 
     printf("\n\n============   Gerando codigo ==============\n");
 
-    if(numArgs >= 4)
-      GeradorDeCodigo::setDiretorioBase(args[3]);
+    if(numArgs >= 3)
+      GeradorDeCodigo::setDiretorioBase(args[2]);
 
     printf("Gerando infraestrutura\n");
     GeradorDeCodigo::gerarInfraestrutura();

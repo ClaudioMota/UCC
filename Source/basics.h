@@ -9,8 +9,12 @@
 #define SUPPORTED_CHARACTERS 256
 #define STRING_LENGTH 64
 
+typedef struct Token Token;
+
 // Retrieves the a string with the content of the given file
 // When not NULL the content must be freed aftwards
 char* readFile(char* path);
+
+bool compilerError(char* message, Token* location);
 
 #endif

@@ -57,6 +57,11 @@ static Parser* createParser(AllProductions* allProductions, Production* (*creati
 
 static Parser* createParserOption(Parser* old)
 {
+  int depth = 0;
+  Parser* aux = old;
+  // TODO apply this to the template and delete the references <- not sure what references mean now
+  while(aux->nextOption){ aux = aux->nextOption; if(++depth > 3) aux->nextOption = nullptr; }
+
   Parser* newParser = &old->allParsers->parsers[old->allParsers->parserCount++];
   
   newParser->pos = old->pos;

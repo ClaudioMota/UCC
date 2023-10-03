@@ -26,7 +26,7 @@ int mainOld(int numArgs, char** args);
 
 int main(int numArgs, char** args)
 {
-  //return mainOld(numArgs, args);
+  // return mainOld(numArgs, args);
   if(numArgs < 3) return showHelp();
 
   char* fileContent = readFile(args[1]);
@@ -37,6 +37,8 @@ int main(int numArgs, char** args)
   int result = compile(fileContent);
 
   free(fileContent);
+
+  printf("finished successfully\n");
 
   return result;
 }
