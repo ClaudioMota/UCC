@@ -13,9 +13,9 @@ extern VisitFunction ucc_visit_Reducer;
 extern VisitFunction ucc_visit_Reducers;
 extern VisitFunction ucc_visit_Production;
 extern VisitFunction ucc_visit_Productions;
+extern VisitFunction ucc_visit_Literal;
 extern VisitFunction ucc_visit_Token;
 extern VisitFunction ucc_visit_Tokens;
-extern VisitFunction ucc_visit_Literal;
 extern VisitFunction ucc_visit_Helper;
 extern VisitFunction ucc_visit_Helpers;
 
@@ -37,16 +37,15 @@ extern VisitFunction ucc_visit_Productions_Productions_Production;
 extern VisitFunction ucc_visit_Op_mult;
 extern VisitFunction ucc_visit_Op_sum;
 extern VisitFunction ucc_visit_Op_or;
-extern VisitFunction ucc_visit_Expr_charLiteral;
+extern VisitFunction ucc_visit_Literal_charLiteral;
+extern VisitFunction ucc_visit_Expr_Literal;
 extern VisitFunction ucc_visit_Expr_o_parentheses_Expr_c_parentheses;
 extern VisitFunction ucc_visit_Token_identifier_attrib_Expr_semicolon;
 extern VisitFunction ucc_visit_Token_mult_identifier_attrib_Expr_semicolon;
 extern VisitFunction ucc_visit_Tokens_Token;
 extern VisitFunction ucc_visit_Tokens_Tokens_Token;
 extern VisitFunction ucc_visit_Literal_decimal;
-extern VisitFunction ucc_visit_Literal_charLiteral;
 extern VisitFunction ucc_visit_Op_sub;
-extern VisitFunction ucc_visit_Expr_Literal;
 extern VisitFunction ucc_visit_Expr_Literal_to_Literal;
 extern VisitFunction ucc_visit_Helper_identifier_attrib_Expr_semicolon;
 extern VisitFunction ucc_visit_Helpers_Helper;
@@ -211,7 +210,14 @@ typedef struct
 	int type;
 	int nodeCount;
 	ProductionNode T_charLiteral0;
-} ucc_Expr_charLiteral;
+} ucc_Literal_charLiteral;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode Literal0;
+} ucc_Expr_Literal;
 
 typedef struct 
 {
@@ -269,22 +275,8 @@ typedef struct
 {
 	int type;
 	int nodeCount;
-	ProductionNode T_charLiteral0;
-} ucc_Literal_charLiteral;
-
-typedef struct 
-{
-	int type;
-	int nodeCount;
 	ProductionNode T_sub0;
 } ucc_Op_sub;
-
-typedef struct 
-{
-	int type;
-	int nodeCount;
-	ProductionNode Literal0;
-} ucc_Expr_Literal;
 
 typedef struct 
 {
@@ -430,16 +422,15 @@ enum ucc_ProductionType
 	ucc_P_Op_mult,
 	ucc_P_Op_sum,
 	ucc_P_Op_or,
-	ucc_P_Expr_charLiteral,
+	ucc_P_Literal_charLiteral,
+	ucc_P_Expr_Literal,
 	ucc_P_Expr_o_parentheses_Expr_c_parentheses,
 	ucc_P_Token_identifier_attrib_Expr_semicolon,
 	ucc_P_Token_mult_identifier_attrib_Expr_semicolon,
 	ucc_P_Tokens_Token,
 	ucc_P_Tokens_Tokens_Token,
 	ucc_P_Literal_decimal,
-	ucc_P_Literal_charLiteral,
 	ucc_P_Op_sub,
-	ucc_P_Expr_Literal,
 	ucc_P_Expr_Literal_to_Literal,
 	ucc_P_Helper_identifier_attrib_Expr_semicolon,
 	ucc_P_Helpers_Helper,

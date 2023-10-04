@@ -1,6 +1,7 @@
 #ifndef UCC_PRODUCTION_HEADER
 #define UCC_PRODUCTION_HEADER 1
 
+#include "basics.h"
 #include "parsers/parser.h"
 
 typedef struct AllProductions AllProductions;
@@ -17,6 +18,9 @@ struct UCCProduction
   int type;
   int nodeCount; 
   ProductionNode nodes[16];
+
+  void* helper, *token, *production, *reducer;
+  char helperValue[SUPPORTED_CHARACTERS];
 
   UCCProduction* next;
 };

@@ -18,12 +18,17 @@ struct Helper
 struct TokenExpr
 {
   char name[STRING_LENGTH];
+  bool ignored;
   void* startState;
+  TokenExpr* first, *second;
+  int operation;
 };
 
 struct ProductionExpr
 {
   char name[STRING_LENGTH];
+  int stepCount;
+  char steps[MAX_PRODUCTION_LENGTH][STRING_LENGTH];
 };
 
 struct ReducerExpr
@@ -45,6 +50,14 @@ struct Grammar
 
 Grammar Grammar_create();
 bool Grammar_load(Grammar* grammar, char* content);
+Helper* Grammar_declareHelper(Grammar* grammar, char* name);
+TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored);
+ProductionExpr* Grammar_addProduction(Grammar* grammar, char* name, int stepCount, char** steps);
+ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to, bool array);
+Helper* Grammar_getHelper(Grammar* grammar, char* name);
+TokenExpr* Grammar_getToken(Grammar* grammar, char* name);
+ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name);
+ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name);
 void Grammar_destroy(Grammar* grammar);
 
 #endif

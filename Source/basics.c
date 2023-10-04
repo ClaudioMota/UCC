@@ -18,5 +18,41 @@ char* readFile(char* path)
 
 bool compilerError(char* message, Token* location)
 {
-  printf("%s %i:%i\n", message, location->line, location->column);
+  if(location)
+    printf("%s %i:%i\n", message, location->line, location->column);
+  else
+    printf("%s\n", message);
+}
+
+char* getStringActualContent(char* ret, char* data)
+{
+  int size = strlen(data);
+  int o = 0;
+  for(int i = 1; i < size -1; i++)
+  {
+    if(data[i] == '\\')
+    {
+      i++;
+      if(i >= size -1) break;
+
+      char escaped;
+      switch(data[i])
+      {
+        case 'n': escaped = '\n'; break;
+        case 't': escaped = '\t'; break;
+        case 'r': escaped = '\r'; break;
+        case '0': escaped = '\0'; break;
+        case 'b': escaped = '\b'; break;
+        case 'a': escaped = '\a'; break;
+        default: escaped = data[i];
+      }
+
+      ret[o++] = escaped;
+    }
+    else
+      ret[o++] = data[i];
+  }
+
+  ret[o] = 0;
+  return ret;
 }

@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include "grammar.h"
 
+#define OK 0
 #define PARAM_ERROR 1
 
 int showHelp()
@@ -17,16 +18,21 @@ int showError(char* error, int type)
 
 int compile(char* fileContent)
 {
+  int ret = OK;
   Grammar grammar = Grammar_create();
-  if(Grammar_load(&grammar, fileContent) == 0);
+  if(Grammar_load(&grammar, fileContent) == 0)
+  {
+
+  }
   Grammar_destroy(&grammar);
+  return ret;
 }
 
 int mainOld(int numArgs, char** args);
 
 int main(int numArgs, char** args)
 {
-  // return mainOld(numArgs, args);
+  //return mainOld(numArgs, args);
   if(numArgs < 3) return showHelp();
 
   char* fileContent = readFile(args[1]);
@@ -38,7 +44,7 @@ int main(int numArgs, char** args)
 
   free(fileContent);
 
-  printf("finished successfully\n");
+  printf("finished with code %i\n", result);
 
   return result;
 }

@@ -15,21 +15,21 @@ static int goToTable(int state, int productionIndex)
 		case 2:
 		switch(productionIndex)
 		{
-			case 26: return 76; break;
-			case 25: return 110; break;
+			case 27: return 77; break;
+			case 26: return 111; break;
 		}
 		break;
 		case 3:
 		switch(productionIndex)
 		{
-			case 20: return 4; break;
-			case 19: return 69; break;
+			case 21: return 4; break;
+			case 20: return 70; break;
 		}
 		break;
 		case 4:
 		switch(productionIndex)
 		{
-			case 19: return 44; break;
+			case 20: return 44; break;
 		}
 		break;
 		case 5:
@@ -155,10 +155,11 @@ static int goToTable(int state, int productionIndex)
 		case 47:
 		switch(productionIndex)
 		{
-			case 18: return 48; break;
-			case 17: return 60; break;
-			case 16: return 63; break;
-			case 15: return 56; break;
+			case 19: return 48; break;
+			case 18: return 60; break;
+			case 17: return 64; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
 		case 48:
@@ -170,16 +171,18 @@ static int goToTable(int state, int productionIndex)
 		case 49:
 		switch(productionIndex)
 		{
-			case 17: return 50; break;
-			case 16: return 63; break;
-			case 15: return 56; break;
+			case 18: return 50; break;
+			case 17: return 64; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
 		case 50:
 		switch(productionIndex)
 		{
-			case 16: return 51; break;
-			case 15: return 56; break;
+			case 17: return 51; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
 		case 51:
@@ -191,10 +194,11 @@ static int goToTable(int state, int productionIndex)
 		case 57:
 		switch(productionIndex)
 		{
-			case 18: return 58; break;
-			case 17: return 60; break;
-			case 16: return 63; break;
-			case 15: return 56; break;
+			case 19: return 58; break;
+			case 18: return 60; break;
+			case 17: return 64; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
 		case 58:
@@ -206,206 +210,208 @@ static int goToTable(int state, int productionIndex)
 		case 60:
 		switch(productionIndex)
 		{
-			case 16: return 51; break;
-			case 15: return 56; break;
+			case 17: return 51; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
-		case 63:
+		case 64:
 		switch(productionIndex)
 		{
 			case 13: return 52; break;
 		}
 		break;
-		case 66:
+		case 67:
 		switch(productionIndex)
 		{
-			case 18: return 67; break;
-			case 17: return 60; break;
-			case 16: return 63; break;
-			case 15: return 56; break;
+			case 19: return 68; break;
+			case 18: return 60; break;
+			case 17: return 64; break;
+			case 16: return 56; break;
+			case 15: return 62; break;
 		}
 		break;
-		case 67:
+		case 68:
 		switch(productionIndex)
 		{
 			case 14: return 49; break;
 		}
 		break;
-		case 70:
-		switch(productionIndex)
-		{
-			case 12: return 73; break;
-			case 11: return 41; break;
-		}
-		break;
 		case 71:
 		switch(productionIndex)
 		{
-			case 5: return 72; break;
-			case 4: return 40; break;
+			case 12: return 74; break;
+			case 11: return 41; break;
 		}
 		break;
 		case 72:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 73; break;
+			case 4: return 40; break;
 		}
 		break;
 		case 73:
 		switch(productionIndex)
 		{
-			case 11: return 7; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 74:
 		switch(productionIndex)
 		{
-			case 5: return 75; break;
-			case 4: return 40; break;
+			case 11: return 7; break;
 		}
 		break;
 		case 75:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 76; break;
+			case 4: return 40; break;
 		}
 		break;
 		case 76:
 		switch(productionIndex)
 		{
-			case 25: return 91; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 77:
 		switch(productionIndex)
 		{
-			case 20: return 84; break;
-			case 19: return 69; break;
+			case 26: return 92; break;
 		}
 		break;
 		case 78:
 		switch(productionIndex)
 		{
-			case 12: return 79; break;
-			case 11: return 41; break;
+			case 21: return 85; break;
+			case 20: return 70; break;
 		}
 		break;
 		case 79:
 		switch(productionIndex)
 		{
-			case 11: return 7; break;
+			case 12: return 80; break;
+			case 11: return 41; break;
 		}
 		break;
 		case 80:
 		switch(productionIndex)
 		{
-			case 5: return 81; break;
-			case 4: return 40; break;
+			case 11: return 7; break;
 		}
 		break;
 		case 81:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 82; break;
+			case 4: return 40; break;
 		}
 		break;
 		case 82:
 		switch(productionIndex)
 		{
-			case 5: return 83; break;
-			case 4: return 40; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 83:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 84; break;
+			case 4: return 40; break;
 		}
 		break;
 		case 84:
 		switch(productionIndex)
 		{
-			case 19: return 44; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 85:
 		switch(productionIndex)
 		{
-			case 12: return 88; break;
-			case 11: return 41; break;
+			case 20: return 44; break;
 		}
 		break;
 		case 86:
 		switch(productionIndex)
 		{
-			case 5: return 87; break;
-			case 4: return 40; break;
+			case 12: return 89; break;
+			case 11: return 41; break;
 		}
 		break;
 		case 87:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 88; break;
+			case 4: return 40; break;
 		}
 		break;
 		case 88:
 		switch(productionIndex)
 		{
-			case 11: return 7; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 89:
 		switch(productionIndex)
 		{
-			case 5: return 90; break;
-			case 4: return 40; break;
+			case 11: return 7; break;
 		}
 		break;
 		case 90:
 		switch(productionIndex)
 		{
-			case 4: return 24; break;
+			case 5: return 91; break;
+			case 4: return 40; break;
 		}
 		break;
-		case 93:
+		case 91:
 		switch(productionIndex)
 		{
-			case 24: return 94; break;
-			case 23: return 107; break;
-			case 21: return 97; break;
+			case 4: return 24; break;
 		}
 		break;
 		case 94:
 		switch(productionIndex)
 		{
-			case 22: return 95; break;
+			case 25: return 95; break;
+			case 24: return 108; break;
+			case 22: return 98; break;
 		}
 		break;
 		case 95:
 		switch(productionIndex)
 		{
 			case 23: return 96; break;
-			case 21: return 97; break;
 		}
 		break;
-		case 98:
+		case 96:
 		switch(productionIndex)
 		{
-			case 21: return 99; break;
+			case 24: return 97; break;
+			case 22: return 98; break;
 		}
 		break;
-		case 102:
+		case 99:
 		switch(productionIndex)
 		{
-			case 24: return 103; break;
-			case 23: return 107; break;
-			case 21: return 97; break;
+			case 22: return 100; break;
 		}
 		break;
 		case 103:
 		switch(productionIndex)
 		{
-			case 22: return 95; break;
+			case 25: return 104; break;
+			case 24: return 108; break;
+			case 22: return 98; break;
+		}
+		break;
+		case 104:
+		switch(productionIndex)
+		{
+			case 23: return 96; break;
 		}
 		break;
 	}
@@ -421,16 +427,16 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createAcceptAction()
 	};
 	Action state2Actions[] = {
-		createShift(T_identifier,92),
+		createShift(T_identifier,93),
 		createShift(T_tokens,3)
 	};
 	Action state3Actions[] = {
-		createShift(T_identifier,65),
-		createShift(T_productions,70),
+		createShift(T_identifier,66),
+		createShift(T_productions,71),
 		createShift(T_mult,45)
 	};
 	Action state4Actions[] = {
-		createShift(T_identifier,65),
+		createShift(T_identifier,66),
 		createShift(T_productions,5),
 		createShift(T_mult,45)
 	};
@@ -601,9 +607,9 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_tokens_Tokens_productions_reducer_Reducers, 6)
 	};
 	Action state44Actions[] = {
-		createReduce1(T_identifier, 20, ucc_P_Tokens_Tokens_Token, 2),
-		createReduce1(T_productions, 20, ucc_P_Tokens_Tokens_Token, 2),
-		createReduce1(T_mult, 20, ucc_P_Tokens_Tokens_Token, 2)
+		createReduce1(T_identifier, 21, ucc_P_Tokens_Tokens_Token, 2),
+		createReduce1(T_productions, 21, ucc_P_Tokens_Tokens_Token, 2),
+		createReduce1(T_mult, 21, ucc_P_Tokens_Tokens_Token, 2)
 	};
 	Action state45Actions[] = {
 		createShift(T_identifier,46)
@@ -614,46 +620,46 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 	Action state47Actions[] = {
 		createShift(T_identifier,61),
 		createShift(T_o_parentheses,57),
-		createShift(T_charLiteral,62)
+		createShift(T_charLiteral,63)
 	};
 	Action state48Actions[] = {
-		createShift(T_semicolon,64),
+		createShift(T_semicolon,65),
 		createShift(T_or,19)
 	};
 	Action state49Actions[] = {
 		createShift(T_identifier,61),
 		createShift(T_o_parentheses,57),
-		createShift(T_charLiteral,62)
+		createShift(T_charLiteral,63)
 	};
 	Action state50Actions[] = {
 		createShift(T_identifier,61),
-		createReduce1(T_semicolon, 18, ucc_P_Expr_Expr_Op_Expr, 3),
+		createReduce1(T_semicolon, 19, ucc_P_Expr_Expr_Op_Expr, 3),
 		createShift(T_o_parentheses,57),
-		createReduce1(T_or, 18, ucc_P_Expr_Expr_Op_Expr, 3),
-		createReduce1(T_c_parentheses, 18, ucc_P_Expr_Expr_Op_Expr, 3),
-		createShift(T_charLiteral,62)
+		createReduce1(T_or, 19, ucc_P_Expr_Expr_Op_Expr, 3),
+		createReduce1(T_c_parentheses, 19, ucc_P_Expr_Expr_Op_Expr, 3),
+		createShift(T_charLiteral,63)
 	};
 	Action state51Actions[] = {
 		createShift(T_sum,53),
-		createReduce1(T_identifier, 17, ucc_P_Expr_Expr_Expr, 2),
-		createReduce1(T_semicolon, 17, ucc_P_Expr_Expr_Expr, 2),
-		createReduce1(T_o_parentheses, 17, ucc_P_Expr_Expr_Expr, 2),
+		createReduce1(T_identifier, 18, ucc_P_Expr_Expr_Expr, 2),
+		createReduce1(T_semicolon, 18, ucc_P_Expr_Expr_Expr, 2),
+		createReduce1(T_o_parentheses, 18, ucc_P_Expr_Expr_Expr, 2),
 		createShift(T_question,55),
-		createReduce1(T_or, 17, ucc_P_Expr_Expr_Expr, 2),
+		createReduce1(T_or, 18, ucc_P_Expr_Expr_Expr, 2),
 		createShift(T_mult,54),
-		createReduce1(T_c_parentheses, 17, ucc_P_Expr_Expr_Expr, 2),
-		createReduce1(T_charLiteral, 17, ucc_P_Expr_Expr_Expr, 2)
+		createReduce1(T_c_parentheses, 18, ucc_P_Expr_Expr_Expr, 2),
+		createReduce1(T_charLiteral, 18, ucc_P_Expr_Expr_Expr, 2)
 	};
 	Action state52Actions[] = {
-		createReduce1(T_sum, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_identifier, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_semicolon, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_o_parentheses, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_question, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_or, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_mult, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_c_parentheses, 16, ucc_P_Expr_Expr_Op, 2),
-		createReduce1(T_charLiteral, 16, ucc_P_Expr_Expr_Op, 2)
+		createReduce1(T_sum, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_identifier, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_semicolon, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_o_parentheses, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_question, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_or, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_mult, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_c_parentheses, 17, ucc_P_Expr_Expr_Op, 2),
+		createReduce1(T_charLiteral, 17, ucc_P_Expr_Expr_Op, 2)
 	};
 	Action state53Actions[] = {
 		createReduce1(T_sum, 13, ucc_P_Op_sum, 1),
@@ -689,305 +695,316 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createReduce1(T_charLiteral, 13, ucc_P_Op_question, 1)
 	};
 	Action state56Actions[] = {
-		createReduce1(T_sum, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_identifier, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_semicolon, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_o_parentheses, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_question, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_or, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_mult, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_c_parentheses, 16, ucc_P_Expr_Expr, 1),
-		createReduce1(T_charLiteral, 16, ucc_P_Expr_Expr, 1)
+		createReduce1(T_sum, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_identifier, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_semicolon, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_o_parentheses, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_question, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_or, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_mult, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_c_parentheses, 17, ucc_P_Expr_Expr, 1),
+		createReduce1(T_charLiteral, 17, ucc_P_Expr_Expr, 1)
 	};
 	Action state57Actions[] = {
 		createShift(T_identifier,61),
 		createShift(T_o_parentheses,57),
-		createShift(T_charLiteral,62)
+		createShift(T_charLiteral,63)
 	};
 	Action state58Actions[] = {
 		createShift(T_or,19),
 		createShift(T_c_parentheses,59)
 	};
 	Action state59Actions[] = {
-		createReduce1(T_sum, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_identifier, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_semicolon, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_o_parentheses, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_question, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_or, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_mult, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_c_parentheses, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_charLiteral, 15, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3)
+		createReduce1(T_sum, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_identifier, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_semicolon, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_o_parentheses, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_question, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_or, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_mult, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_c_parentheses, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_charLiteral, 16, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3)
 	};
 	Action state60Actions[] = {
 		createShift(T_identifier,61),
-		createReduce1(T_semicolon, 18, ucc_P_Expr_Expr, 1),
+		createReduce1(T_semicolon, 19, ucc_P_Expr_Expr, 1),
 		createShift(T_o_parentheses,57),
-		createReduce1(T_or, 18, ucc_P_Expr_Expr, 1),
-		createReduce1(T_c_parentheses, 18, ucc_P_Expr_Expr, 1),
-		createShift(T_charLiteral,62)
+		createReduce1(T_or, 19, ucc_P_Expr_Expr, 1),
+		createReduce1(T_c_parentheses, 19, ucc_P_Expr_Expr, 1),
+		createShift(T_charLiteral,63)
 	};
 	Action state61Actions[] = {
-		createReduce1(T_sum, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_identifier, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_semicolon, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_o_parentheses, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_question, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_or, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_mult, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_c_parentheses, 15, ucc_P_Expr_identifier, 1),
-		createReduce1(T_charLiteral, 15, ucc_P_Expr_identifier, 1)
+		createReduce1(T_sum, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_identifier, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_semicolon, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_o_parentheses, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_question, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_or, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_mult, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_c_parentheses, 16, ucc_P_Expr_identifier, 1),
+		createReduce1(T_charLiteral, 16, ucc_P_Expr_identifier, 1)
 	};
 	Action state62Actions[] = {
-		createReduce1(T_sum, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_identifier, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_semicolon, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_o_parentheses, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_question, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_or, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_mult, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_c_parentheses, 15, ucc_P_Expr_charLiteral, 1),
-		createReduce1(T_charLiteral, 15, ucc_P_Expr_charLiteral, 1)
+		createReduce1(T_sum, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_identifier, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_semicolon, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_o_parentheses, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_question, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_or, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_mult, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_c_parentheses, 16, ucc_P_Expr_Literal, 1),
+		createReduce1(T_charLiteral, 16, ucc_P_Expr_Literal, 1)
 	};
 	Action state63Actions[] = {
-		createShift(T_sum,53),
-		createReduce1(T_identifier, 17, ucc_P_Expr_Expr, 1),
-		createReduce1(T_semicolon, 17, ucc_P_Expr_Expr, 1),
-		createReduce1(T_o_parentheses, 17, ucc_P_Expr_Expr, 1),
-		createShift(T_question,55),
-		createReduce1(T_or, 17, ucc_P_Expr_Expr, 1),
-		createShift(T_mult,54),
-		createReduce1(T_c_parentheses, 17, ucc_P_Expr_Expr, 1),
-		createReduce1(T_charLiteral, 17, ucc_P_Expr_Expr, 1)
+		createReduce1(T_sum, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_identifier, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_semicolon, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_o_parentheses, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_question, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_or, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_mult, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_c_parentheses, 15, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_charLiteral, 15, ucc_P_Literal_charLiteral, 1)
 	};
 	Action state64Actions[] = {
-		createReduce1(T_identifier, 19, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5),
-		createReduce1(T_productions, 19, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5),
-		createReduce1(T_mult, 19, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5)
+		createShift(T_sum,53),
+		createReduce1(T_identifier, 18, ucc_P_Expr_Expr, 1),
+		createReduce1(T_semicolon, 18, ucc_P_Expr_Expr, 1),
+		createReduce1(T_o_parentheses, 18, ucc_P_Expr_Expr, 1),
+		createShift(T_question,55),
+		createReduce1(T_or, 18, ucc_P_Expr_Expr, 1),
+		createShift(T_mult,54),
+		createReduce1(T_c_parentheses, 18, ucc_P_Expr_Expr, 1),
+		createReduce1(T_charLiteral, 18, ucc_P_Expr_Expr, 1)
 	};
 	Action state65Actions[] = {
-		createShift(T_attrib,66)
+		createReduce1(T_identifier, 20, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5),
+		createReduce1(T_productions, 20, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5),
+		createReduce1(T_mult, 20, ucc_P_Token_mult_identifier_attrib_Expr_semicolon, 5)
 	};
 	Action state66Actions[] = {
-		createShift(T_identifier,61),
-		createShift(T_o_parentheses,57),
-		createShift(T_charLiteral,62)
+		createShift(T_attrib,67)
 	};
 	Action state67Actions[] = {
-		createShift(T_semicolon,68),
-		createShift(T_or,19)
+		createShift(T_identifier,61),
+		createShift(T_o_parentheses,57),
+		createShift(T_charLiteral,63)
 	};
 	Action state68Actions[] = {
-		createReduce1(T_identifier, 19, ucc_P_Token_identifier_attrib_Expr_semicolon, 4),
-		createReduce1(T_productions, 19, ucc_P_Token_identifier_attrib_Expr_semicolon, 4),
-		createReduce1(T_mult, 19, ucc_P_Token_identifier_attrib_Expr_semicolon, 4)
+		createShift(T_semicolon,69),
+		createShift(T_or,19)
 	};
 	Action state69Actions[] = {
-		createReduce1(T_identifier, 20, ucc_P_Tokens_Token, 1),
-		createReduce1(T_productions, 20, ucc_P_Tokens_Token, 1),
-		createReduce1(T_mult, 20, ucc_P_Tokens_Token, 1)
+		createReduce1(T_identifier, 20, ucc_P_Token_identifier_attrib_Expr_semicolon, 4),
+		createReduce1(T_productions, 20, ucc_P_Token_identifier_attrib_Expr_semicolon, 4),
+		createReduce1(T_mult, 20, ucc_P_Token_identifier_attrib_Expr_semicolon, 4)
 	};
 	Action state70Actions[] = {
-		createShift(T_identifier,8),
-		createShift(T_reducer,71)
+		createReduce1(T_identifier, 21, ucc_P_Tokens_Token, 1),
+		createReduce1(T_productions, 21, ucc_P_Tokens_Token, 1),
+		createReduce1(T_mult, 21, ucc_P_Tokens_Token, 1)
 	};
 	Action state71Actions[] = {
+		createShift(T_identifier,8),
+		createShift(T_reducer,72)
+	};
+	Action state72Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state72Actions[] = {
+	Action state73Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_tokens_productions_reducer_Reducers, 5)
 	};
-	Action state73Actions[] = {
-		createShift(T_identifier,8),
-		createShift(T_reducer,74)
-	};
 	Action state74Actions[] = {
+		createShift(T_identifier,8),
+		createShift(T_reducer,75)
+	};
+	Action state75Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state75Actions[] = {
+	Action state76Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_tokens_productions_Productions_reducer_Reducers, 6)
 	};
-	Action state76Actions[] = {
-		createShift(T_identifier,92),
-		createShift(T_tokens,77)
-	};
 	Action state77Actions[] = {
-		createShift(T_identifier,65),
-		createShift(T_productions,78),
-		createShift(T_mult,45)
+		createShift(T_identifier,93),
+		createShift(T_tokens,78)
 	};
 	Action state78Actions[] = {
-		createShift(T_identifier,8),
-		createShift(T_reducer,82)
+		createShift(T_identifier,66),
+		createShift(T_productions,79),
+		createShift(T_mult,45)
 	};
 	Action state79Actions[] = {
 		createShift(T_identifier,8),
-		createShift(T_reducer,80)
+		createShift(T_reducer,83)
 	};
 	Action state80Actions[] = {
+		createShift(T_identifier,8),
+		createShift(T_reducer,81)
+	};
+	Action state81Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state81Actions[] = {
+	Action state82Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_Helpers_tokens_productions_Productions_reducer_Reducers, 7)
 	};
-	Action state82Actions[] = {
+	Action state83Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state83Actions[] = {
+	Action state84Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_Helpers_tokens_productions_reducer_Reducers, 6)
 	};
-	Action state84Actions[] = {
-		createShift(T_identifier,65),
-		createShift(T_productions,85),
+	Action state85Actions[] = {
+		createShift(T_identifier,66),
+		createShift(T_productions,86),
 		createShift(T_mult,45)
 	};
-	Action state85Actions[] = {
-		createShift(T_identifier,8),
-		createShift(T_reducer,86)
-	};
 	Action state86Actions[] = {
+		createShift(T_identifier,8),
+		createShift(T_reducer,87)
+	};
+	Action state87Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state87Actions[] = {
+	Action state88Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_reducer_Reducers, 7)
 	};
-	Action state88Actions[] = {
-		createShift(T_identifier,8),
-		createShift(T_reducer,89)
-	};
 	Action state89Actions[] = {
+		createShift(T_identifier,8),
+		createShift(T_reducer,90)
+	};
+	Action state90Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34)
 	};
-	Action state90Actions[] = {
+	Action state91Actions[] = {
 		createShift(T_identifier,25),
 		createShift(T_o_brackets,34),
 		createReduce1(END_OF_INPUT, 0, ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer_Reducers, 8)
 	};
-	Action state91Actions[] = {
-		createReduce1(T_identifier, 26, ucc_P_Helpers_Helpers_Helper, 2),
-		createReduce1(T_tokens, 26, ucc_P_Helpers_Helpers_Helper, 2)
-	};
 	Action state92Actions[] = {
-		createShift(T_attrib,93)
+		createReduce1(T_identifier, 27, ucc_P_Helpers_Helpers_Helper, 2),
+		createReduce1(T_tokens, 27, ucc_P_Helpers_Helpers_Helper, 2)
 	};
 	Action state93Actions[] = {
-		createShift(T_identifier,108),
-		createShift(T_o_parentheses,102),
-		createShift(T_decimal,101),
-		createShift(T_charLiteral,100)
+		createShift(T_attrib,94)
 	};
 	Action state94Actions[] = {
-		createShift(T_sum,104),
-		createShift(T_semicolon,109),
-		createShift(T_sub,105)
+		createShift(T_decimal,102),
+		createShift(T_identifier,109),
+		createShift(T_o_parentheses,103),
+		createShift(T_charLiteral,101)
 	};
 	Action state95Actions[] = {
-		createShift(T_identifier,108),
-		createShift(T_o_parentheses,102),
-		createShift(T_decimal,101),
-		createShift(T_charLiteral,100)
+		createShift(T_sum,105),
+		createShift(T_semicolon,110),
+		createShift(T_sub,106)
 	};
 	Action state96Actions[] = {
-		createReduce1(T_sum, 24, ucc_P_Expr_Expr_Op_Expr, 3),
-		createReduce1(T_semicolon, 24, ucc_P_Expr_Expr_Op_Expr, 3),
-		createReduce1(T_c_parentheses, 24, ucc_P_Expr_Expr_Op_Expr, 3),
-		createReduce1(T_sub, 24, ucc_P_Expr_Expr_Op_Expr, 3)
+		createShift(T_decimal,102),
+		createShift(T_identifier,109),
+		createShift(T_o_parentheses,103),
+		createShift(T_charLiteral,101)
 	};
 	Action state97Actions[] = {
-		createReduce1(T_sum, 23, ucc_P_Expr_Literal, 1),
-		createReduce1(T_semicolon, 23, ucc_P_Expr_Literal, 1),
-		createShift(T_to,98),
-		createReduce1(T_c_parentheses, 23, ucc_P_Expr_Literal, 1),
-		createReduce1(T_sub, 23, ucc_P_Expr_Literal, 1)
+		createReduce1(T_sum, 25, ucc_P_Expr_Expr_Op_Expr, 3),
+		createReduce1(T_semicolon, 25, ucc_P_Expr_Expr_Op_Expr, 3),
+		createReduce1(T_c_parentheses, 25, ucc_P_Expr_Expr_Op_Expr, 3),
+		createReduce1(T_sub, 25, ucc_P_Expr_Expr_Op_Expr, 3)
 	};
 	Action state98Actions[] = {
-		createShift(T_decimal,101),
-		createShift(T_charLiteral,100)
+		createReduce1(T_sum, 24, ucc_P_Expr_Literal, 1),
+		createReduce1(T_semicolon, 24, ucc_P_Expr_Literal, 1),
+		createShift(T_to,99),
+		createReduce1(T_c_parentheses, 24, ucc_P_Expr_Literal, 1),
+		createReduce1(T_sub, 24, ucc_P_Expr_Literal, 1)
 	};
 	Action state99Actions[] = {
-		createReduce1(T_sum, 23, ucc_P_Expr_Literal_to_Literal, 3),
-		createReduce1(T_semicolon, 23, ucc_P_Expr_Literal_to_Literal, 3),
-		createReduce1(T_c_parentheses, 23, ucc_P_Expr_Literal_to_Literal, 3),
-		createReduce1(T_sub, 23, ucc_P_Expr_Literal_to_Literal, 3)
+		createShift(T_decimal,102),
+		createShift(T_charLiteral,101)
 	};
 	Action state100Actions[] = {
-		createReduce1(T_sum, 21, ucc_P_Literal_charLiteral, 1),
-		createReduce1(T_semicolon, 21, ucc_P_Literal_charLiteral, 1),
-		createReduce1(T_to, 21, ucc_P_Literal_charLiteral, 1),
-		createReduce1(T_c_parentheses, 21, ucc_P_Literal_charLiteral, 1),
-		createReduce1(T_sub, 21, ucc_P_Literal_charLiteral, 1)
+		createReduce1(T_sum, 24, ucc_P_Expr_Literal_to_Literal, 3),
+		createReduce1(T_semicolon, 24, ucc_P_Expr_Literal_to_Literal, 3),
+		createReduce1(T_c_parentheses, 24, ucc_P_Expr_Literal_to_Literal, 3),
+		createReduce1(T_sub, 24, ucc_P_Expr_Literal_to_Literal, 3)
 	};
 	Action state101Actions[] = {
-		createReduce1(T_sum, 21, ucc_P_Literal_decimal, 1),
-		createReduce1(T_semicolon, 21, ucc_P_Literal_decimal, 1),
-		createReduce1(T_to, 21, ucc_P_Literal_decimal, 1),
-		createReduce1(T_c_parentheses, 21, ucc_P_Literal_decimal, 1),
-		createReduce1(T_sub, 21, ucc_P_Literal_decimal, 1)
+		createReduce1(T_sum, 22, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_semicolon, 22, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_to, 22, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_c_parentheses, 22, ucc_P_Literal_charLiteral, 1),
+		createReduce1(T_sub, 22, ucc_P_Literal_charLiteral, 1)
 	};
 	Action state102Actions[] = {
-		createShift(T_identifier,108),
-		createShift(T_o_parentheses,102),
-		createShift(T_decimal,101),
-		createShift(T_charLiteral,100)
+		createReduce1(T_sum, 22, ucc_P_Literal_decimal, 1),
+		createReduce1(T_semicolon, 22, ucc_P_Literal_decimal, 1),
+		createReduce1(T_to, 22, ucc_P_Literal_decimal, 1),
+		createReduce1(T_c_parentheses, 22, ucc_P_Literal_decimal, 1),
+		createReduce1(T_sub, 22, ucc_P_Literal_decimal, 1)
 	};
 	Action state103Actions[] = {
-		createShift(T_sum,104),
-		createShift(T_c_parentheses,106),
-		createShift(T_sub,105)
+		createShift(T_decimal,102),
+		createShift(T_identifier,109),
+		createShift(T_o_parentheses,103),
+		createShift(T_charLiteral,101)
 	};
 	Action state104Actions[] = {
-		createReduce1(T_identifier, 22, ucc_P_Op_sum, 1),
-		createReduce1(T_o_parentheses, 22, ucc_P_Op_sum, 1),
-		createReduce1(T_decimal, 22, ucc_P_Op_sum, 1),
-		createReduce1(T_charLiteral, 22, ucc_P_Op_sum, 1)
+		createShift(T_sum,105),
+		createShift(T_c_parentheses,107),
+		createShift(T_sub,106)
 	};
 	Action state105Actions[] = {
-		createReduce1(T_identifier, 22, ucc_P_Op_sub, 1),
-		createReduce1(T_o_parentheses, 22, ucc_P_Op_sub, 1),
-		createReduce1(T_decimal, 22, ucc_P_Op_sub, 1),
-		createReduce1(T_charLiteral, 22, ucc_P_Op_sub, 1)
+		createReduce1(T_decimal, 23, ucc_P_Op_sum, 1),
+		createReduce1(T_identifier, 23, ucc_P_Op_sum, 1),
+		createReduce1(T_o_parentheses, 23, ucc_P_Op_sum, 1),
+		createReduce1(T_charLiteral, 23, ucc_P_Op_sum, 1)
 	};
 	Action state106Actions[] = {
-		createReduce1(T_sum, 23, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_semicolon, 23, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_c_parentheses, 23, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
-		createReduce1(T_sub, 23, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3)
+		createReduce1(T_decimal, 23, ucc_P_Op_sub, 1),
+		createReduce1(T_identifier, 23, ucc_P_Op_sub, 1),
+		createReduce1(T_o_parentheses, 23, ucc_P_Op_sub, 1),
+		createReduce1(T_charLiteral, 23, ucc_P_Op_sub, 1)
 	};
 	Action state107Actions[] = {
-		createReduce1(T_sum, 24, ucc_P_Expr_Expr, 1),
-		createReduce1(T_semicolon, 24, ucc_P_Expr_Expr, 1),
-		createReduce1(T_c_parentheses, 24, ucc_P_Expr_Expr, 1),
-		createReduce1(T_sub, 24, ucc_P_Expr_Expr, 1)
+		createReduce1(T_sum, 24, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_semicolon, 24, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_c_parentheses, 24, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3),
+		createReduce1(T_sub, 24, ucc_P_Expr_o_parentheses_Expr_c_parentheses, 3)
 	};
 	Action state108Actions[] = {
-		createReduce1(T_sum, 23, ucc_P_Expr_identifier, 1),
-		createReduce1(T_semicolon, 23, ucc_P_Expr_identifier, 1),
-		createReduce1(T_c_parentheses, 23, ucc_P_Expr_identifier, 1),
-		createReduce1(T_sub, 23, ucc_P_Expr_identifier, 1)
+		createReduce1(T_sum, 25, ucc_P_Expr_Expr, 1),
+		createReduce1(T_semicolon, 25, ucc_P_Expr_Expr, 1),
+		createReduce1(T_c_parentheses, 25, ucc_P_Expr_Expr, 1),
+		createReduce1(T_sub, 25, ucc_P_Expr_Expr, 1)
 	};
 	Action state109Actions[] = {
-		createReduce1(T_identifier, 25, ucc_P_Helper_identifier_attrib_Expr_semicolon, 4),
-		createReduce1(T_tokens, 25, ucc_P_Helper_identifier_attrib_Expr_semicolon, 4)
+		createReduce1(T_sum, 24, ucc_P_Expr_identifier, 1),
+		createReduce1(T_semicolon, 24, ucc_P_Expr_identifier, 1),
+		createReduce1(T_c_parentheses, 24, ucc_P_Expr_identifier, 1),
+		createReduce1(T_sub, 24, ucc_P_Expr_identifier, 1)
 	};
 	Action state110Actions[] = {
-		createReduce1(T_identifier, 26, ucc_P_Helpers_Helper, 1),
-		createReduce1(T_tokens, 26, ucc_P_Helpers_Helper, 1)
+		createReduce1(T_identifier, 26, ucc_P_Helper_identifier_attrib_Expr_semicolon, 4),
+		createReduce1(T_tokens, 26, ucc_P_Helper_identifier_attrib_Expr_semicolon, 4)
+	};
+	Action state111Actions[] = {
+		createReduce1(T_identifier, 27, ucc_P_Helpers_Helper, 1),
+		createReduce1(T_tokens, 27, ucc_P_Helpers_Helper, 1)
 	};
 	State states[] = {
 		createState(state0Actions, sizeof(state0Actions)/sizeof(Action)),
@@ -1100,7 +1117,8 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createState(state107Actions, sizeof(state107Actions)/sizeof(Action)),
 		createState(state108Actions, sizeof(state108Actions)/sizeof(Action)),
 		createState(state109Actions, sizeof(state109Actions)/sizeof(Action)),
-		createState(state110Actions, sizeof(state110Actions)/sizeof(Action))
+		createState(state110Actions, sizeof(state110Actions)/sizeof(Action)),
+		createState(state111Actions, sizeof(state111Actions)/sizeof(Action))
 	};
 	return parse(allProductions, creationFunction, states, goToTable, token);
 }

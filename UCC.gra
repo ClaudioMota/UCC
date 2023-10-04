@@ -56,44 +56,51 @@ decimal = hDigit+;
 //----------------------------------
 Productions:
 
-Total = helpers Helpers? tokens Tokens? productions Productions? reducer Reducers;
+Total = helpers Helpers? tokens Tokens? productions Productions? reducer Reducers?;
 
 Helpers = Helpers Helper | Helper;
 Helper = identifier attrib HelperExpr semicolon;
-HelperExpr = HelperFactor0 | HelperFactor0 HelperOperator HelperFactor0;
-HelperFactor0 = Literal to Literal | o_parentheses HelperExpr c_parentheses | Literal;
+HelperExpr = HelperFactor0 | HelperExpr HelperOperator HelperFactor0;
+HelperFactor0 = HLiteral to HLiteral | o_parentheses HelperExpr c_parentheses | HLiteral | identifier;
 HelperOperator = sum | sub;
 
-Literal = charLiteral | decimal;
+HLiteral = charLiteral | decimal;
 
 Tokens = Tokens Token | Token;
-Token = identifier attrib TokenExpr semicolon;
-TokenExpr = TokenFactor0 | TokenFactor0 OrOperator TokenFactor0;
-TokenFactor0 = TokenFactor1 | TokenFactor1 TokenFactor1;
-TokenFactor1 = TokenFactor2 | TokenFactor2 ModifierOperator;
-TokenFactor2 = o_parentheses TokenExpr c_parentheses | identifier;
+Token = mult? identifier attrib TokenExpr semicolon;
+TokenExpr = TokenFactor0 | TokenExpr OrOperator TokenFactor0;
+TokenFactor0 = TokenFactor1 | TokenFactor0 TokenFactor1;
+TokenFactor1 = TokenFactor2 | TokenFactor1 ModifierOperator;
+TokenFactor2 = o_parentheses TokenExpr c_parentheses | identifier | TLiteral;
+
+TLiteral = charLiteral;
 
 OrOperator = or;
 ModifierOperator = sum | mult | question;
 
 Productions = Productions Production | Production;
 Production = identifier attrib ProductionExpr semicolon;
-ProductionExpr = ProductionFactor0 | ProductionFactor0 OrOperator ProductionFactor0;
-ProductionFactor0 = ProductionFactor1 | ProductionFactor1 ProductionFactor1;
-ProductionFactor1 = ProductionFactor2 | ProductionFactor2 QuestionOperator;
+ProductionExpr = ProductionFactor0 | ProductionExpr OrOperator ProductionFactor0;
+ProductionFactor0 = ProductionFactor1 | ProductionFactor0 ProductionFactor1;
+ProductionFactor1 = ProductionFactor2 | ProductionFactor1 QuestionOperator;
 ProductionFactor2 = identifier;
 
 QuestionOperator = question;
 
 Reducers = Reducers Reducer | Reducer;
-Reducer = identifier reduce ReducerExpr semicolon | o_brackets identifier c_brackets reduce ReducerExpr;
-ReducerExpr = ReducerFactor0 | ReducerFactor0 CommaOperator ReducerFactor0;
+Reducer = identifier reduce ReducerExpr semicolon | o_brackets identifier c_brackets reduce ReducerExpr semicolon;
+ReducerExpr = ReducerFactor0 | ReducerExpr CommaOperator ReducerFactor0;
 ReducerFactor0 = identifier;
 
+CommaOperator = comma;
+
+//----------------------------------
+//----------------------------------
 Reducer:
 
 Expr <- HelperExpr, HelperFactor0, TokenExpr, TokenFactor0, TokenFactor1, TokenFactor2, ProductionExpr, ProductionFactor0, ProductionFactor1, ProductionFactor2, ReducerExpr, ReducerFactor0;
-Op <- HelperOperator, OrOperator, ModifierOperator, QuestionOperator;
+Op <- HelperOperator, OrOperator, ModifierOperator, QuestionOperator, CommaOperator;
+Literal <- HLiteral, TLiteral;
 
 [Helper] <- Helpers;
 [Token] <- Tokens;

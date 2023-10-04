@@ -25,7 +25,9 @@ VisitFunction ucc_visit_Productions_Productions_Production = nullptr;
 VisitFunction ucc_visit_Op_mult = nullptr;
 VisitFunction ucc_visit_Op_sum = nullptr;
 VisitFunction ucc_visit_Op_or = nullptr;
-VisitFunction ucc_visit_Expr_charLiteral = nullptr;
+VisitFunction ucc_visit_Literal_charLiteral = nullptr;
+VisitFunction ucc_visit_Literal = nullptr;
+VisitFunction ucc_visit_Expr_Literal = nullptr;
 VisitFunction ucc_visit_Expr_o_parentheses_Expr_c_parentheses = nullptr;
 VisitFunction ucc_visit_Token_identifier_attrib_Expr_semicolon = nullptr;
 VisitFunction ucc_visit_Token = nullptr;
@@ -34,10 +36,7 @@ VisitFunction ucc_visit_Tokens_Token = nullptr;
 VisitFunction ucc_visit_Tokens = nullptr;
 VisitFunction ucc_visit_Tokens_Tokens_Token = nullptr;
 VisitFunction ucc_visit_Literal_decimal = nullptr;
-VisitFunction ucc_visit_Literal = nullptr;
-VisitFunction ucc_visit_Literal_charLiteral = nullptr;
 VisitFunction ucc_visit_Op_sub = nullptr;
-VisitFunction ucc_visit_Expr_Literal = nullptr;
 VisitFunction ucc_visit_Expr_Literal_to_Literal = nullptr;
 VisitFunction ucc_visit_Helper_identifier_attrib_Expr_semicolon = nullptr;
 VisitFunction ucc_visit_Helper = nullptr;
@@ -75,16 +74,15 @@ bool ucc_visit(Production* production, VisitData* visitData)
 		case ucc_P_Op_mult: visitFunction = ucc_visit_Op_mult; break;
 		case ucc_P_Op_sum: visitFunction = ucc_visit_Op_sum; break;
 		case ucc_P_Op_or: visitFunction = ucc_visit_Op_or; break;
-		case ucc_P_Expr_charLiteral: visitFunction = ucc_visit_Expr_charLiteral; break;
+		case ucc_P_Literal_charLiteral: visitFunction = ucc_visit_Literal_charLiteral; break;
+		case ucc_P_Expr_Literal: visitFunction = ucc_visit_Expr_Literal; break;
 		case ucc_P_Expr_o_parentheses_Expr_c_parentheses: visitFunction = ucc_visit_Expr_o_parentheses_Expr_c_parentheses; break;
 		case ucc_P_Token_identifier_attrib_Expr_semicolon: visitFunction = ucc_visit_Token_identifier_attrib_Expr_semicolon; break;
 		case ucc_P_Token_mult_identifier_attrib_Expr_semicolon: visitFunction = ucc_visit_Token_mult_identifier_attrib_Expr_semicolon; break;
 		case ucc_P_Tokens_Token: visitFunction = ucc_visit_Tokens_Token; break;
 		case ucc_P_Tokens_Tokens_Token: visitFunction = ucc_visit_Tokens_Tokens_Token; break;
 		case ucc_P_Literal_decimal: visitFunction = ucc_visit_Literal_decimal; break;
-		case ucc_P_Literal_charLiteral: visitFunction = ucc_visit_Literal_charLiteral; break;
 		case ucc_P_Op_sub: visitFunction = ucc_visit_Op_sub; break;
-		case ucc_P_Expr_Literal: visitFunction = ucc_visit_Expr_Literal; break;
 		case ucc_P_Expr_Literal_to_Literal: visitFunction = ucc_visit_Expr_Literal_to_Literal; break;
 		case ucc_P_Helper_identifier_attrib_Expr_semicolon: visitFunction = ucc_visit_Helper_identifier_attrib_Expr_semicolon; break;
 		case ucc_P_Helpers_Helper: visitFunction = ucc_visit_Helpers_Helper; break;
@@ -107,9 +105,8 @@ bool ucc_visit(Production* production, VisitData* visitData)
 		case ucc_P_Expr_Expr:
 		case ucc_P_Expr_Expr_Op:
 		case ucc_P_Expr_Expr_Expr:
-		case ucc_P_Expr_charLiteral:
-		case ucc_P_Expr_o_parentheses_Expr_c_parentheses:
 		case ucc_P_Expr_Literal:
+		case ucc_P_Expr_o_parentheses_Expr_c_parentheses:
 		case ucc_P_Expr_Literal_to_Literal:
 			visitFunction = ucc_visit_Expr;
 		break;
@@ -120,8 +117,8 @@ bool ucc_visit(Production* production, VisitData* visitData)
 		case ucc_P_Helpers_Helpers_Helper:
 			visitFunction = ucc_visit_Helpers;
 		break;
-		case ucc_P_Literal_decimal:
 		case ucc_P_Literal_charLiteral:
+		case ucc_P_Literal_decimal:
 			visitFunction = ucc_visit_Literal;
 		break;
 		case ucc_P_Op_comma:
@@ -193,16 +190,15 @@ bool ucc_nodeRedundancyTable[] = {
 	,false // Op_mult
 	,false // Op_sum
 	,false // Op_or
-	,false // Expr_charLiteral
+	,false // Literal_charLiteral
+	,false // Expr_Literal
 	,false // Expr_o_parentheses_Expr_c_parentheses
 	,false // Token_identifier_attrib_Expr_semicolon
 	,false // Token_mult_identifier_attrib_Expr_semicolon
 	,false // Tokens_Token
 	,false // Tokens_Tokens_Token
 	,false // Literal_decimal
-	,false // Literal_charLiteral
 	,false // Op_sub
-	,false // Expr_Literal
 	,false // Expr_Literal_to_Literal
 	,false // Helper_identifier_attrib_Expr_semicolon
 	,false // Helpers_Helper
