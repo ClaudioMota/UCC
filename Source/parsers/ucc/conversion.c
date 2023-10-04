@@ -289,6 +289,12 @@ static bool visitReducer(UCCProduction* production, VisitData* visitData)
 
   if(ret)
   {
+    bool array = production->type != ucc_P_Reducer_identifier_reduce_Expr_semicolon;
+    int idetifierIndex = array ? 1 : 0;
+    int exprIndex = array ? 4 : 2;
+    int count = getProductionListSize(production->nodes[exprIndex].production);
+    printf("->%i\n", count);
+
     //ProductionExpr* decl = Grammar_reduce(visitData->grammar, );
     //if(!decl) return compilerError("Could not declare token", production->T_identifier0.token);
   }

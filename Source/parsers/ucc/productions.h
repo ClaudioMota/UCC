@@ -19,10 +19,10 @@ extern VisitFunction ucc_visit_Tokens;
 extern VisitFunction ucc_visit_Helper;
 extern VisitFunction ucc_visit_Helpers;
 
-extern VisitFunction ucc_visit_Total_helpers_tokens_productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_tokens_productions_reducer;
 extern VisitFunction ucc_visit_Op_comma;
 extern VisitFunction ucc_visit_Expr_identifier;
-extern VisitFunction ucc_visit_Expr_Expr_Op_Expr;
+extern VisitFunction ucc_visit_Expr_Expr_comma_Expr;
 extern VisitFunction ucc_visit_Expr_Expr;
 extern VisitFunction ucc_visit_Reducer_o_brackets_identifier_c_brackets_reduce_Expr_semicolon;
 extern VisitFunction ucc_visit_Reducer_identifier_reduce_Expr_semicolon;
@@ -31,6 +31,7 @@ extern VisitFunction ucc_visit_Reducers_Reducers_Reducer;
 extern VisitFunction ucc_visit_Op_question;
 extern VisitFunction ucc_visit_Expr_Expr_Op;
 extern VisitFunction ucc_visit_Expr_Expr_Expr;
+extern VisitFunction ucc_visit_Expr_Expr_Op_Expr;
 extern VisitFunction ucc_visit_Production_identifier_attrib_Expr_semicolon;
 extern VisitFunction ucc_visit_Productions_Production;
 extern VisitFunction ucc_visit_Productions_Productions_Production;
@@ -50,12 +51,20 @@ extern VisitFunction ucc_visit_Expr_Literal_to_Literal;
 extern VisitFunction ucc_visit_Helper_identifier_attrib_Expr_semicolon;
 extern VisitFunction ucc_visit_Helpers_Helper;
 extern VisitFunction ucc_visit_Helpers_Helpers_Helper;
+extern VisitFunction ucc_visit_Total_helpers_tokens_productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_tokens_productions_Productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_tokens_productions_Productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_tokens_Tokens_productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_tokens_Tokens_productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_tokens_Tokens_productions_Productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_tokens_Tokens_productions_Productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_productions_Productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_productions_Productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_Tokens_productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_Tokens_productions_reducer_Reducers;
+extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer;
 extern VisitFunction ucc_visit_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer_Reducers;
 
 typedef struct 
@@ -66,8 +75,7 @@ typedef struct
 	ProductionNode T_tokens1;
 	ProductionNode T_productions2;
 	ProductionNode T_reducer3;
-	ProductionNode Reducers4;
-} ucc_Total_helpers_tokens_productions_reducer_Reducers;
+} ucc_Total_helpers_tokens_productions_reducer;
 
 typedef struct 
 {
@@ -88,9 +96,9 @@ typedef struct
 	int type;
 	int nodeCount;
 	ProductionNode Expr0;
-	ProductionNode Op1;
+	ProductionNode T_comma1;
 	ProductionNode Expr2;
-} ucc_Expr_Expr_Op_Expr;
+} ucc_Expr_Expr_comma_Expr;
 
 typedef struct 
 {
@@ -158,6 +166,15 @@ typedef struct
 	ProductionNode Expr0;
 	ProductionNode Expr1;
 } ucc_Expr_Expr_Expr;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode Expr0;
+	ProductionNode Op1;
+	ProductionNode Expr2;
+} ucc_Expr_Expr_Op_Expr;
 
 typedef struct 
 {
@@ -319,10 +336,43 @@ typedef struct
 	ProductionNode T_helpers0;
 	ProductionNode T_tokens1;
 	ProductionNode T_productions2;
+	ProductionNode T_reducer3;
+	ProductionNode Reducers4;
+} ucc_Total_helpers_tokens_productions_reducer_Reducers;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode T_tokens1;
+	ProductionNode T_productions2;
+	ProductionNode Productions3;
+	ProductionNode T_reducer4;
+} ucc_Total_helpers_tokens_productions_Productions_reducer;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode T_tokens1;
+	ProductionNode T_productions2;
 	ProductionNode Productions3;
 	ProductionNode T_reducer4;
 	ProductionNode Reducers5;
 } ucc_Total_helpers_tokens_productions_Productions_reducer_Reducers;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode T_tokens1;
+	ProductionNode Tokens2;
+	ProductionNode T_productions3;
+	ProductionNode T_reducer4;
+} ucc_Total_helpers_tokens_Tokens_productions_reducer;
 
 typedef struct 
 {
@@ -346,8 +396,31 @@ typedef struct
 	ProductionNode T_productions3;
 	ProductionNode Productions4;
 	ProductionNode T_reducer5;
+} ucc_Total_helpers_tokens_Tokens_productions_Productions_reducer;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode T_tokens1;
+	ProductionNode Tokens2;
+	ProductionNode T_productions3;
+	ProductionNode Productions4;
+	ProductionNode T_reducer5;
 	ProductionNode Reducers6;
 } ucc_Total_helpers_tokens_Tokens_productions_Productions_reducer_Reducers;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode Helpers1;
+	ProductionNode T_tokens2;
+	ProductionNode T_productions3;
+	ProductionNode T_reducer4;
+} ucc_Total_helpers_Helpers_tokens_productions_reducer;
 
 typedef struct 
 {
@@ -371,8 +444,32 @@ typedef struct
 	ProductionNode T_productions3;
 	ProductionNode Productions4;
 	ProductionNode T_reducer5;
+} ucc_Total_helpers_Helpers_tokens_productions_Productions_reducer;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode Helpers1;
+	ProductionNode T_tokens2;
+	ProductionNode T_productions3;
+	ProductionNode Productions4;
+	ProductionNode T_reducer5;
 	ProductionNode Reducers6;
 } ucc_Total_helpers_Helpers_tokens_productions_Productions_reducer_Reducers;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode Helpers1;
+	ProductionNode T_tokens2;
+	ProductionNode Tokens3;
+	ProductionNode T_productions4;
+	ProductionNode T_reducer5;
+} ucc_Total_helpers_Helpers_tokens_Tokens_productions_reducer;
 
 typedef struct 
 {
@@ -398,16 +495,29 @@ typedef struct
 	ProductionNode T_productions4;
 	ProductionNode Productions5;
 	ProductionNode T_reducer6;
+} ucc_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer;
+
+typedef struct 
+{
+	int type;
+	int nodeCount;
+	ProductionNode T_helpers0;
+	ProductionNode Helpers1;
+	ProductionNode T_tokens2;
+	ProductionNode Tokens3;
+	ProductionNode T_productions4;
+	ProductionNode Productions5;
+	ProductionNode T_reducer6;
 	ProductionNode Reducers7;
 } ucc_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer_Reducers;
 
 enum ucc_ProductionType
 {
 	ucc_P_UNKONOWN_PROD,
-	ucc_P_Total_helpers_tokens_productions_reducer_Reducers,
+	ucc_P_Total_helpers_tokens_productions_reducer,
 	ucc_P_Op_comma,
 	ucc_P_Expr_identifier,
-	ucc_P_Expr_Expr_Op_Expr,
+	ucc_P_Expr_Expr_comma_Expr,
 	ucc_P_Expr_Expr,
 	ucc_P_Reducer_o_brackets_identifier_c_brackets_reduce_Expr_semicolon,
 	ucc_P_Reducer_identifier_reduce_Expr_semicolon,
@@ -416,6 +526,7 @@ enum ucc_ProductionType
 	ucc_P_Op_question,
 	ucc_P_Expr_Expr_Op,
 	ucc_P_Expr_Expr_Expr,
+	ucc_P_Expr_Expr_Op_Expr,
 	ucc_P_Production_identifier_attrib_Expr_semicolon,
 	ucc_P_Productions_Production,
 	ucc_P_Productions_Productions_Production,
@@ -435,12 +546,20 @@ enum ucc_ProductionType
 	ucc_P_Helper_identifier_attrib_Expr_semicolon,
 	ucc_P_Helpers_Helper,
 	ucc_P_Helpers_Helpers_Helper,
+	ucc_P_Total_helpers_tokens_productions_reducer_Reducers,
+	ucc_P_Total_helpers_tokens_productions_Productions_reducer,
 	ucc_P_Total_helpers_tokens_productions_Productions_reducer_Reducers,
+	ucc_P_Total_helpers_tokens_Tokens_productions_reducer,
 	ucc_P_Total_helpers_tokens_Tokens_productions_reducer_Reducers,
+	ucc_P_Total_helpers_tokens_Tokens_productions_Productions_reducer,
 	ucc_P_Total_helpers_tokens_Tokens_productions_Productions_reducer_Reducers,
+	ucc_P_Total_helpers_Helpers_tokens_productions_reducer,
 	ucc_P_Total_helpers_Helpers_tokens_productions_reducer_Reducers,
+	ucc_P_Total_helpers_Helpers_tokens_productions_Productions_reducer,
 	ucc_P_Total_helpers_Helpers_tokens_productions_Productions_reducer_Reducers,
+	ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_reducer,
 	ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_reducer_Reducers,
+	ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer,
 	ucc_P_Total_helpers_Helpers_tokens_Tokens_productions_Productions_reducer_Reducers
 };
 

@@ -89,7 +89,7 @@ QuestionOperator = question;
 
 Reducers = Reducers Reducer | Reducer;
 Reducer = identifier reduce ReducerExpr semicolon | o_brackets identifier c_brackets reduce ReducerExpr semicolon;
-ReducerExpr = ReducerFactor0 | ReducerExpr CommaOperator ReducerFactor0;
+ReducerExpr = ReducerFactor0 | ReducerExpr comma ReducerFactor0;
 ReducerFactor0 = identifier;
 
 CommaOperator = comma;
