@@ -37,7 +37,9 @@ bool Grammar_load(Grammar* grammar, char* content)
 
   if(!parser.hasError)
   {
-    ret = processProductions(grammar, getMainProduction(&parser));
+    Production* mainProd = getMainProduction(&parser);
+    reduceNodes(mainProd, ucc_nodeRedundancyTable);
+    ret = processProductions(grammar, mainProd);
   }
   else
   {
@@ -69,7 +71,9 @@ TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored)
 
   int index = grammar->tokenCount++;
   strcpy(grammar->tokens[index].name, name);
-  grammar->tokens[index].ignored = true;
+  grammar->tokens[index].ignored = ignored;
+  grammar->tokens[index].stateMachine = StateMachine_create();
+
   return &grammar->tokens[index];
 }
 
@@ -133,4 +137,8 @@ ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 void Grammar_destroy(Grammar* grammar)
 {
   if(grammar->errorMessage) free(grammar->errorMessage);
+  for(int i = 0; i < grammar->tokenCount; i++)
+  {
+    StateMachine_destroy(&grammar->tokens[i].stateMachine);
+  }
 }

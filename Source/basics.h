@@ -10,6 +10,10 @@
 #define STRING_LENGTH 64
 #define MAX_PRODUCTION_LENGTH 16
 
+#ifndef nullptr
+#define nullptr 0
+#endif
+
 typedef struct Token Token;
 
 // Retrieves the a string with the content of the given file
@@ -19,5 +23,7 @@ char* readFile(char* path);
 bool compilerError(char* message, Token* location);
 
 char* getStringActualContent(char* ret, char* data);
+
+bool failIfNull(void* pointer, char* errorMessage);
 
 #endif

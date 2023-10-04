@@ -2,6 +2,7 @@
 #define GRAMMAR_HEADER 1
 
 #include "basics.h"
+#include "stateMachine.h"
 
 typedef struct Grammar Grammar;
 typedef struct Helper Helper;
@@ -19,9 +20,7 @@ struct TokenExpr
 {
   char name[STRING_LENGTH];
   bool ignored;
-  void* startState;
-  TokenExpr* first, *second;
-  int operation;
+  StateMachine stateMachine;
 };
 
 struct ProductionExpr

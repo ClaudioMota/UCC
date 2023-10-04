@@ -49,7 +49,7 @@ static int getLiteralAsInteger(Production* literal)
   {
     case ucc_P_Literal_decimal: return atoi(token->content);
     case ucc_P_Literal_charLiteral:
-      if(len >= 3) return getStringActualContent(actual, token->content)[1];
+      if(len >= 3) return getStringActualContent(actual, token->content)[0];
     default:
       return 0;
   }
@@ -121,6 +121,70 @@ static bool visitIdentifierExpr(UCCProduction* production, VisitData* visitData)
   return compilerError("Could not find reference", production->nodes[0].token);
 }
 
+static StateMachineState* createStateMachineStates(Production* expr, StateMachine* stateMachine, StateMachineState* current)
+{
+  switch(expr->type)
+  {
+    case ucc_P_Expr_Expr_Expr:
+    {
+      StateMachineState* end = createStateMachineStates(expr->nodes[0].production, stateMachine, current);
+      return createStateMachineStates(expr->nodes[1].production, stateMachine, end);
+    }
+    case ucc_P_Expr_Expr_Op:
+    {
+      StateMachineState* end = createStateMachineStates(expr->nodes[0].production, stateMachine, current);
+      if(expr->nodes[1].production->type != ucc_P_Op_question)
+        if(failIfNull(StateMachine_addTransition(stateMachine, end, current, 0), "Could not create transitions"))
+          return current;
+      if(expr->nodes[1].production->type == ucc_P_Op_sum)
+        return end;
+      else
+        return current;
+    }
+    case ucc_P_Expr_Expr_Op_Expr:
+    {
+      StateMachineState* firstEnd = createStateMachineStates(expr->nodes[0].production, stateMachine, current);
+      StateMachineState* secondEnd = createStateMachineStates(expr->nodes[2].production, stateMachine, current);
+      StateMachineState* end = StateMachine_createState(stateMachine);
+      if(failIfNull(end, "Could not create state")) return current;
+      if(failIfNull(StateMachine_addTransition(stateMachine, firstEnd, end, 0), "Could not create transitions"))
+        return current;
+      if(failIfNull(StateMachine_addTransition(stateMachine, secondEnd, end, 0), "Could not create transitions"))
+        return current;
+      return end;
+    }
+    case ucc_P_Expr_identifier:
+    {
+      StateMachineState* end = StateMachine_createState(stateMachine);
+      if(failIfNull(end, "Could not create state")) return current;
+      Helper* helper = uccProduction(expr)->helper;
+      if(failIfNull(helper, "When defining a token identifiers must be a helper")) return current;
+      for(int i = 0; i < SUPPORTED_CHARACTERS; i++)
+        if(helper->values[i])
+          if(failIfNull(StateMachine_addTransition(stateMachine, current, end, i), "Could not create transitions"))
+            return current;
+      return end;
+    }
+    case ucc_P_Expr_Literal:
+    {
+      Token* token = expr->nodes[0].production->nodes[0].token;
+      int len = strlen(token->content);
+      char actual[len];
+      len = strlen(getStringActualContent(actual, token->content));
+      for(int i = 0; i < len; i++)
+      {
+        StateMachineState* s = StateMachine_createState(stateMachine);
+        if(failIfNull(StateMachine_addTransition(stateMachine, current, s, actual[i]), "Could not create transitions"))
+          return current;
+        current = s;
+      }
+      return current;
+    }
+    case ucc_P_Expr_o_parentheses_Expr_c_parentheses:
+      return createStateMachineStates(expr->nodes[1].production, stateMachine, current);
+  }
+}
+
 static bool visitToken(UCCProduction* production, VisitData* visitData)
 {
   visitData->mode = MODE_TOKEN;
@@ -132,6 +196,9 @@ static bool visitToken(UCCProduction* production, VisitData* visitData)
     Token* token =  production->nodes[offset].token;
     TokenExpr* decl = Grammar_declareToken(visitData->grammar, token->content, offset == 1);
     if(!decl) return compilerError("Could not declare token", token);
+
+    StateMachineState* last = createStateMachineStates(production->nodes[offset + 2].production, &decl->stateMachine, decl->stateMachine.start);
+    last->accepted = true;
   }
 
   return ret;

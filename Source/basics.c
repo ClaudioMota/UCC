@@ -24,6 +24,14 @@ bool compilerError(char* message, Token* location)
     printf("%s\n", message);
 }
 
+bool failIfNull(void* pointer, char* errorMessage)
+{
+  if(pointer)
+    return false;
+  else
+    return !compilerError(errorMessage, nullptr);
+}
+
 char* getStringActualContent(char* ret, char* data)
 {
   int size = strlen(data);
