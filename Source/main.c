@@ -22,11 +22,12 @@ int compile(char* fileContent)
   Grammar grammar = Grammar_create();
   if(Grammar_load(&grammar, fileContent) == 0)
   {
-
   }
   Grammar_destroy(&grammar);
   return ret;
 }
+
+
 
 int mainOld(int numArgs, char** args);
 

@@ -37,6 +37,8 @@ StateMachineState* StateMachine_createState(StateMachine* stateMachine);
 
 StateMachineTransition* StateMachine_addTransition(StateMachine* stateMachine, StateMachineState* from, StateMachineState* to, unsigned char value);
 
+void StateMachine_makeDeterministic(StateMachine* stateMachine);
+
 void StateMachine_destroy(StateMachine* stateMachine);
 
 #endif
