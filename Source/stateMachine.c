@@ -75,6 +75,7 @@ StateMachineTransition* StateMachine_addTransition(StateMachine* stateMachine, S
 
 static void mergeCompoundState(CompoundState* dest, CompoundState* src)
 {
+  dest->accepted = dest->accepted || src->accepted;
   for(int i = 0; i < src->count; i++)
   {
     bool alreadyPresent = false;
@@ -94,7 +95,7 @@ static CompoundState* findExistingCompoundState(CompoundState* deterministicStat
 {
   for(int i = 0; i < deterministicStateCount; i++)
   {
-    if(deterministicStates[i].count == subject->count)
+    if(deterministicStates[i].count == subject->count && deterministicStates[i].accepted == subject->accepted)
     {
       bool miss = false;
       for(int j = 0; j < subject->count; j++)
@@ -124,26 +125,26 @@ static void getNullReachableStates(
 
   CompoundState compoundState;
   memset(&compoundState, 0, sizeof(compoundState));
-  compoundState.states[compoundState.count++] = state;
   if(state->accepted) compoundState.accepted = true;
+
+  bool hasNonEmptyTransition = false;
+  for(int i = 0; i < state->transitionCount; i++)
+    for(int v = 1; v < SUPPORTED_CHARACTERS; v++)
+      if(state->transitions[i].values[v]) hasNonEmptyTransition = true;
+
+  if(hasNonEmptyTransition || state->transitionCount == 0)
+    compoundState.states[compoundState.count++] = state;
 
   for(int i = 0; i < state->transitionCount; i++)
     if(state->transitions[i].values[0])
     {
       StateMachineState* target = state->transitions[i].target;
-      if(target != state) compoundState.states[compoundState.count++] = target;
+      if(target != state)
+      {
+        getNullReachableStates(target, compoundStateMapper, deterministicStates, deterministicStateCount);
+        mergeCompoundState(&compoundState, compoundStateMapper[target->index]);
+      }
     }
-  
-  for(int i = 1; i < compoundState.count; i++)
-  {
-    StateMachineState* target = compoundState.states[i];
-    if(target != state)
-    {
-      if(target->accepted) compoundState.accepted = true;
-      getNullReachableStates(target, compoundStateMapper, deterministicStates, deterministicStateCount);
-      mergeCompoundState(&compoundState, compoundStateMapper[target->index]);
-    }
-  }
 
   CompoundState* detState = findExistingCompoundState(deterministicStates, &compoundState, *deterministicStateCount);
   if(!detState)
@@ -192,7 +193,7 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
   CompoundState* deterministicStates = malloc(sizeof(CompoundState)*STATE_MACHINE_MAX_STATES);
   memset(compoundStateMapper, 0, sizeof(compoundStateMapper));
   memset(deterministicStates, 0, sizeof(deterministicStates));
-  
+
   for(int i = 0; i < stateMachine->stateCount; i++)
     getNullReachableStates(stateMachine->states[i], compoundStateMapper, deterministicStates, &deterministicStateCount);
 
