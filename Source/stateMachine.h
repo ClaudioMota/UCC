@@ -39,6 +39,10 @@ StateMachineTransition* StateMachine_addTransition(StateMachine* stateMachine, S
 
 void StateMachine_makeDeterministic(StateMachine* stateMachine);
 
+StateMachineState* StateMachine_step(StateMachineState* state, unsigned char input);
+
+void StateMachine_print(StateMachine* stateMachine);
+
 void StateMachine_destroy(StateMachine* stateMachine);
 
 #endif

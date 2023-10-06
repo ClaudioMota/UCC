@@ -55,7 +55,7 @@ static int getLiteralAsInteger(Production* literal)
   }
 }
 
-static bool calcHelperValue(UCCProduction* production)
+static void calcHelperValue(UCCProduction* production)
 {
   switch(production->type)
   {
@@ -78,9 +78,17 @@ static bool calcHelperValue(UCCProduction* production)
       memcpy(production->helperValue, ((Helper*)production->helper)->values, SUPPORTED_CHARACTERS);
     }
     break;
+    case ucc_P_Expr_Expr_Op_Expr:
+    {
+      UCCProduction* a = uccProduction(production->nodes[0].production);
+      UCCProduction* b = uccProduction(production->nodes[2].production);
+      memcpy(production->helperValue, a->helperValue, SUPPORTED_CHARACTERS);
+      bool set = production->nodes[1].production->type == ucc_P_Op_sum;
+      for(int i = 0; i < SUPPORTED_CHARACTERS; i++)
+        if(b->helperValue[i]) production->helperValue[i] = set;
+    }
+    break;
   }
-
-  return true;
 }
 
 static bool visitExpr(Production* production, VisitData* visitData)
@@ -96,7 +104,7 @@ static bool visitExpr(Production* production, VisitData* visitData)
   }
   switch(visitData->mode)
   {
-    case MODE_HELPER: return calcHelperValue(uccProduction(production)); break;
+    case MODE_HELPER: calcHelperValue(uccProduction(production)); break;
     default:
   }
 
@@ -293,7 +301,6 @@ static bool visitReducer(UCCProduction* production, VisitData* visitData)
     int idetifierIndex = array ? 1 : 0;
     int exprIndex = array ? 4 : 2;
     int count = getProductionListSize(production->nodes[exprIndex].production);
-    printf("->%i\n", count);
 
     //ProductionExpr* decl = Grammar_reduce(visitData->grammar, );
     //if(!decl) return compilerError("Could not declare token", production->T_identifier0.token);

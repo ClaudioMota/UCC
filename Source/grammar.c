@@ -17,20 +17,21 @@ Grammar Grammar_create()
   return ret;
 }
 
+static void makeTokensDeterministic(Grammar* grammar)
+{
+  for(int i = 0; i < grammar->tokenCount; i++)
+    StateMachine_makeDeterministic(&grammar->tokens[i].stateMachine);
+}
+
 static bool processProductions(Grammar* grammar, Production* mainProd)
 {
   VisitData visitData;
   visitData.grammar = grammar;
   setupVisitFunctions();
-  if(!ucc_visit(mainProd, &visitData)) return compilerError("Failed to process productions", nullptr);
-}
-
-static void makeTokensDeterministic(Grammar* grammar)
-{
-  for(int i = 0; i < grammar->tokenCount; i++)
-  {
-    StateMachine_makeDeterministic(&grammar->tokens[i].stateMachine);
-  }
+  if(!ucc_visit(mainProd, &visitData))
+    return compilerError("Failed to process productions", nullptr);
+  makeTokensDeterministic(grammar);
+  return true;
 }
 
 bool Grammar_load(Grammar* grammar, char* content)
@@ -48,7 +49,6 @@ bool Grammar_load(Grammar* grammar, char* content)
     Production* mainProd = getMainProduction(&parser);
     reduceNodes(mainProd, ucc_nodeRedundancyTable);
     ret = processProductions(grammar, mainProd);
-    makeTokensDeterministic(grammar);
   }
   else
   {

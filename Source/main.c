@@ -1,8 +1,12 @@
 #include<stdio.h>
 #include "grammar.h"
 
-#define OK 0
-#define PARAM_ERROR 1
+enum ReturnCodes
+{
+  OK,
+  PARAM_ERROR,
+  COMPILE_ERROR
+};
 
 int showHelp()
 {
@@ -16,20 +20,31 @@ int showError(char* error, int type)
   return type;
 }
 
-int compile(char* fileContent)
-{
-  int ret = OK;
-  Grammar grammar = Grammar_create();
-  if(Grammar_load(&grammar, fileContent) == 0)
-  {
-  }
-  Grammar_destroy(&grammar);
-  return ret;
+int compile(Grammar* grammar, char* fileContent)
+{ 
+  if(!Grammar_load(grammar, fileContent)) return COMPILE_ERROR;
+  
+  return OK;
 }
 
-
-
 int mainOld(int numArgs, char** args);
+
+void testToken(Grammar* grammar, char* str)
+{ 
+  int length = strlen(str);
+  StateMachineState* states[grammar->tokenCount];
+  for(int s = 0; s < grammar->tokenCount; s++)
+    states[s] = grammar->tokens[s].stateMachine.start;
+
+  for(int i = 0; i < length; i++)
+    for(int s = 0; s < grammar->tokenCount; s++)
+      if(states[s] != nullptr)
+        states[s] = StateMachine_step(states[s], str[i]);
+  
+  for(int s = 0; s < grammar->tokenCount; s++)
+    if(states[s] != nullptr && states[s]->accepted)
+      printf("%s\n", grammar->tokens[s].name);
+}
 
 int main(int numArgs, char** args)
 {
@@ -37,15 +52,18 @@ int main(int numArgs, char** args)
   if(numArgs < 3) return showHelp();
 
   char* fileContent = readFile(args[1]);
-  char* namespace = args[2];
   if(!fileContent)
     return showError("Could not open grammar file", PARAM_ERROR);
 
-  int result = compile(fileContent);
+  Grammar grammar = Grammar_create();
+  int ret = compile(&grammar, fileContent);
 
+  if(ret == OK && strcmp(args[2], "-token") == 0) testToken(&grammar, args[3]);
+
+  Grammar_destroy(&grammar);
   free(fileContent);
 
-  printf("finished with code %i\n", result);
+  printf("finished with code %i\n", ret);
 
-  return result;
+  return ret;
 }

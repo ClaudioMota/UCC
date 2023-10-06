@@ -1,5 +1,7 @@
 #include "stateMachine.h"
 
+#include <stdio.h>
+
 typedef struct CompoundState CompoundState;
 typedef struct CompoundTransition CompoundTransition;
 
@@ -7,7 +9,7 @@ typedef struct CompoundTransition CompoundTransition;
 
 struct CompoundTransition
 {
-  bool values[SUPPORTED_CHARACTERS];
+  int value;
   CompoundState* target;
 };
 
@@ -17,6 +19,7 @@ struct CompoundState
   int transitionCount;
   bool accepted;
   int index;
+  bool reachable;
   StateMachineState* states[COMPOUND_STATE_MAX];
   CompoundTransition transitions[STATE_MACHINE_MAX_STATES];
 };
@@ -87,36 +90,6 @@ static void mergeCompoundState(CompoundState* dest, CompoundState* src)
   }
 }
 
-static void getNullReachableStates(
-    StateMachineState* state,
-    CompoundState** compoundStateMapper,
-    CompoundState* deterministicStates,
-    int* deterministicStateCount
-  )
-{
-  if(compoundStateMapper[state->index]) return;
-  compoundStateMapper[state->index] = &deterministicStates[*deterministicStateCount];
-  CompoundState* detState = compoundStateMapper[state->index];
-  detState->index = (*deterministicStateCount)++;
-  detState->states[detState->count++] = state;
-  if(state->accepted) detState->accepted = true;
-
-  for(int i = 0; i < state->transitionCount; i++)
-    if(state->transitions[i].values[0])
-    {
-      StateMachineState* target = state->transitions[i].target;
-      if(target != state) detState->states[detState->count++] = target;
-      if(target->accepted) detState->accepted = true;
-    }
-  
-  for(int i = 0; i < detState->count; i++)
-  {
-    StateMachineState* target = detState->states[i];
-    getNullReachableStates(target, compoundStateMapper, deterministicStates, deterministicStateCount);
-    mergeCompoundState(detState, compoundStateMapper[target->index]);
-  }
-}
-
 static CompoundState* findExistingCompoundState(CompoundState* deterministicStates, CompoundState* subject, int deterministicStateCount)
 {
   for(int i = 0; i < deterministicStateCount; i++)
@@ -138,21 +111,78 @@ static CompoundState* findExistingCompoundState(CompoundState* deterministicStat
   return nullptr;
 }
 
+static void getNullReachableStates(
+    StateMachineState* state,
+    CompoundState** compoundStateMapper,
+    CompoundState* deterministicStates,
+    int* deterministicStateCount
+  )
+{
+  if(compoundStateMapper[state->index]) return;
+
+  compoundStateMapper[state->index] = (void*)-1;
+
+  CompoundState compoundState;
+  memset(&compoundState, 0, sizeof(compoundState));
+  compoundState.states[compoundState.count++] = state;
+  if(state->accepted) compoundState.accepted = true;
+
+  for(int i = 0; i < state->transitionCount; i++)
+    if(state->transitions[i].values[0])
+    {
+      StateMachineState* target = state->transitions[i].target;
+      if(target != state) compoundState.states[compoundState.count++] = target;
+    }
+  
+  for(int i = 1; i < compoundState.count; i++)
+  {
+    StateMachineState* target = compoundState.states[i];
+    if(target != state)
+    {
+      if(target->accepted) compoundState.accepted = true;
+      getNullReachableStates(target, compoundStateMapper, deterministicStates, deterministicStateCount);
+      mergeCompoundState(&compoundState, compoundStateMapper[target->index]);
+    }
+  }
+
+  CompoundState* detState = findExistingCompoundState(deterministicStates, &compoundState, *deterministicStateCount);
+  if(!detState)
+  {
+    detState = &deterministicStates[*deterministicStateCount];
+    memcpy(detState, &compoundState, sizeof(compoundState));
+    detState->index = (*deterministicStateCount)++;
+  }
+
+  compoundStateMapper[state->index] = detState;
+}
+
 static void replaceWithDeterministicStates(StateMachine* stateMachine, CompoundState* deterministicStates, int deterministicStateCount)
 {
+  int map[ELEMENTS_MAX];
   StateMachine_destroy(stateMachine);
   doCreate(stateMachine);
   for(int i = 0; i < deterministicStateCount; i++)
-    StateMachine_createState(stateMachine);
+  {
+    if(deterministicStates[i].reachable)
+    {
+      StateMachineState* state = StateMachine_createState(stateMachine);
+      state->accepted = deterministicStates[i].accepted;
+      map[deterministicStates[i].index] = state->index;
+    }
+  }
+  stateMachine->start = stateMachine->states[0];
 
   for(int i = 0; i < deterministicStateCount; i++)
-    for(int j = 0; j < deterministicStates[i].transitionCount; j++)
-    {
-      CompoundTransition* ct = &deterministicStates[i].transitions[j];
-      StateMachineTransition* transition =
-        StateMachine_addTransition(stateMachine, stateMachine->states[i], stateMachine->states[ct->target->index], 1);
-      memcpy(transition->values, ct->values, SUPPORTED_CHARACTERS);
-    }
+  {
+    if(deterministicStates[i].reachable)
+      for(int j = 0; j < deterministicStates[i].transitionCount; j++)
+      {
+        int s = map[deterministicStates[i].index];
+        CompoundTransition* ct = &deterministicStates[i].transitions[j];
+        StateMachineTransition* transition =
+          StateMachine_addTransition(stateMachine, stateMachine->states[s], stateMachine->states[map[ct->target->index]], ct->value);
+      }
+  }
 }
 
 void StateMachine_makeDeterministic(StateMachine* stateMachine)
@@ -166,33 +196,42 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
   for(int i = 0; i < stateMachine->stateCount; i++)
     getNullReachableStates(stateMachine->states[i], compoundStateMapper, deterministicStates, &deterministicStateCount);
 
-  for(int i = 0; i < stateMachine->stateCount; i++)
+  deterministicStates[0].reachable = true;
+
+  for(int i = 0; i < deterministicStateCount; i++)
   {
-    CompoundState* detState = compoundStateMapper[stateMachine->states[i]->index];
+    CompoundState* detState = &deterministicStates[i];
     for(int v = 1; v < SUPPORTED_CHARACTERS; v++)
     {
-      CompoundState compoundState;
+      CompoundState targetCompoundState;
       CompoundTransition compoundTransition;
-      memset(&compoundState, 0, sizeof(compoundState));
+      memset(&targetCompoundState, 0, sizeof(targetCompoundState));
       memset(&compoundTransition, 0, sizeof(compoundTransition));
+      
+      bool any = false;
       for(int d = 0; d < detState->count; d++)
         for(int t = 0; t < detState->states[d]->transitionCount; t++)
         {
           StateMachineTransition* transition = &detState->states[d]->transitions[t];
+
           if(transition->values[v])
           {
-            mergeCompoundState(&compoundState, compoundStateMapper[transition->target->index]);
-            compoundTransition.values[v] = true;
+            compoundTransition.value = v;
+            any = true;
+            mergeCompoundState(&targetCompoundState, compoundStateMapper[transition->target->index]);
           }
         }
-      
-      compoundTransition.target = findExistingCompoundState(deterministicStates, &compoundState, deterministicStateCount);
+
+      if(!any) continue;
+
+      compoundTransition.target = findExistingCompoundState(deterministicStates, &targetCompoundState, deterministicStateCount);
       if(!compoundTransition.target)
       {
         compoundTransition.target = &deterministicStates[deterministicStateCount];
+        memcpy(compoundTransition.target, &targetCompoundState, sizeof(targetCompoundState));
         compoundTransition.target->index = deterministicStateCount++;
-        memcpy(compoundTransition.target, &compoundState, sizeof(compoundState));
       }
+      compoundTransition.target->reachable = true;
       memcpy(&detState->transitions[detState->transitionCount++], &compoundTransition, sizeof(compoundTransition));
     }
   }
@@ -200,6 +239,31 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
   replaceWithDeterministicStates(stateMachine, deterministicStates, deterministicStateCount);
 
   free(deterministicStates);
+}
+
+StateMachineState* StateMachine_step(StateMachineState* state, unsigned char input)
+{
+  for(int i = 0; i < state->transitionCount; i++)
+    if(state->transitions[i].values[input])
+      return state->transitions[i].target;
+
+  return nullptr;
+}
+
+void StateMachine_print(StateMachine* stateMachine)
+{
+  for(int i = 0; i < stateMachine->stateCount; i++)
+  {
+    if(stateMachine->start == stateMachine->states[i]) printf("->");
+    if(stateMachine->states[i]->accepted) printf("*");
+    printf("%i\n", stateMachine->states[i]->index);
+    for(int j = 0; j < stateMachine->states[i]->transitionCount; j++)
+    {
+      for(int v = 0; v < SUPPORTED_CHARACTERS; v++)
+        if(stateMachine->states[i]->transitions[j].values[v]) printf(" %c", v);
+      printf(" -> %i\n", stateMachine->states[i]->transitions[j].target->index);
+    }
+  }
 }
 
 void StateMachine_destroy(StateMachine* stateMachine)
