@@ -21,26 +21,30 @@ struct CompoundState
   int index;
   bool reachable;
   StateMachineState* states[COMPOUND_STATE_MAX];
-  CompoundTransition transitions[STATE_MACHINE_MAX_STATES];
+  CompoundTransition transitions[SUPPORTED_CHARACTERS];
 };
-
-static void doCreate(StateMachine* stateMachine)
-{
-  memset(stateMachine, 0, sizeof(StateMachine));
-  stateMachine->states = new(sizeof(StateMachineState*)*STATE_MACHINE_MAX_STATES);
-}
 
 StateMachine StateMachine_create()
 {
   StateMachine ret;
-  doCreate(&ret);
+  memset(&ret, 0, sizeof(StateMachine));
   StateMachine_createState(&ret);
   return ret;
 }
 
 StateMachineState* StateMachine_createState(StateMachine* stateMachine)
 {
-  if(stateMachine->stateCount >= STATE_MACHINE_MAX_STATES) return nullptr;
+  if(stateMachine->stateCount >= stateMachine->stateCapacity)
+  {
+    stateMachine->stateCapacity *= 2;
+    if(stateMachine->stateCapacity == 0) stateMachine->stateCapacity = INITIAL_CAPACITY;
+    StateMachineState** states = new(sizeof(StateMachineState*)*stateMachine->stateCapacity);
+    for(int i = 0; i < stateMachine->stateCount; i++)
+      states[i] = stateMachine->states[i];
+    if(stateMachine->states) delete(stateMachine->states);
+    stateMachine->states = states;
+  }
+
   int index = stateMachine->stateCount++;
   
   StateMachineState* ret = new(sizeof(StateMachineState));
@@ -63,7 +67,7 @@ StateMachineTransition* StateMachine_addTransition(StateMachine* stateMachine, S
 
   if(!transition)
   {
-    if(from->transitionCount >= STATE_MACHINE_MAX_STATES) return nullptr;
+    if(from->transitionCount >= SUPPORTED_CHARACTERS) return nullptr;
     transition = &from->transitions[from->transitionCount++];
     transition->target = to;
   }
@@ -159,9 +163,9 @@ static void getNullReachableStates(
 
 static void replaceWithDeterministicStates(StateMachine* stateMachine, CompoundState* deterministicStates, int deterministicStateCount)
 {
-  int map[ELEMENTS_MAX];
-  StateMachine_destroy(stateMachine);
-  doCreate(stateMachine);
+  int* map = new(deterministicStateCount*sizeof(int));
+  StateMachine_clean(stateMachine);
+  
   for(int i = 0; i < deterministicStateCount; i++)
   {
     if(deterministicStates[i].reachable)
@@ -184,15 +188,17 @@ static void replaceWithDeterministicStates(StateMachine* stateMachine, CompoundS
           StateMachine_addTransition(stateMachine, stateMachine->states[s], stateMachine->states[map[ct->target->index]], ct->value);
       }
   }
+
+  delete(map);
 }
 
 void StateMachine_makeDeterministic(StateMachine* stateMachine)
 {
   int deterministicStateCount = 0;
-  CompoundState* compoundStateMapper[STATE_MACHINE_MAX_STATES];
-  CompoundState* deterministicStates = new(sizeof(CompoundState)*STATE_MACHINE_MAX_STATES);
-  memset(compoundStateMapper, 0, sizeof(compoundStateMapper));
-  memset(deterministicStates, 0, sizeof(deterministicStates));
+  CompoundState** compoundStateMapper = new(sizeof(CompoundState*)*stateMachine->stateCount);
+  CompoundState* deterministicStates = new(sizeof(CompoundState)*stateMachine->stateCount*2);
+  memset(compoundStateMapper, 0, sizeof(CompoundState*)*stateMachine->stateCount);
+  memset(deterministicStates, 0, sizeof(CompoundState)*stateMachine->stateCount*2);
 
   for(int i = 0; i < stateMachine->stateCount; i++)
     getNullReachableStates(stateMachine->states[i], compoundStateMapper, deterministicStates, &deterministicStateCount);
@@ -240,6 +246,7 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
   replaceWithDeterministicStates(stateMachine, deterministicStates, deterministicStateCount);
 
   delete(deterministicStates);
+  delete(compoundStateMapper);
 }
 
 StateMachineState* StateMachine_step(StateMachineState* state, unsigned char input)
@@ -267,9 +274,10 @@ void StateMachine_print(StateMachine* stateMachine)
   }
 }
 
-void StateMachine_destroy(StateMachine* stateMachine)
+void StateMachine_clean(StateMachine* stateMachine)
 {
   for(int i = 0; i < stateMachine->stateCount; i++)
     delete(stateMachine->states[i]);
   delete(stateMachine->states);
+  memset(stateMachine, 0, sizeof(StateMachine));
 }

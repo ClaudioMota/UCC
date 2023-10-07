@@ -68,10 +68,12 @@ void Lexer_parse(Lexer* lexer, char* string)
   }
 }
 
-void Lexer_destroy(Lexer* lexer)
+void Lexer_clean(Lexer* lexer)
 {
   if(lexer->states) delete(lexer->states);
-  if(lexer->tokens) Token_destroy(lexer->tokens);
+  if(lexer->tokens) Token_deleteAll(lexer->tokens);
+
+  memset(lexer, 0, sizeof(Lexer));
 }
 
 Token Token_create(int type, char* string, int startIndex, int length, int startLine, int startColumn)
@@ -92,7 +94,7 @@ Token Token_create(int type, char* string, int startIndex, int length, int start
   return ret;
 }
 
-void Token_destroy(Token* token)
+void Token_deleteAll(Token* token)
 {
   while(token)
   {

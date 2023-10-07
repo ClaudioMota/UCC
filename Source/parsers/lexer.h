@@ -48,11 +48,11 @@ Lexer Lexer_create(int stateFunctionsCount, int (**stateFunctions)(int* state, i
 
 void Lexer_parse(Lexer* lexer, char* string);
 
-void Lexer_destroy(Lexer* lexer);
+void Lexer_clean(Lexer* lexer);
 
 Token Token_create(int type, char* string, int startIndex, int length, int startLine, int startColumn);
 
-void Token_destroy(Token* token);
+void Token_deleteAll(Token* token);
 
 #ifdef __cplusplus
 }

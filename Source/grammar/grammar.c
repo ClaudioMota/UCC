@@ -58,7 +58,7 @@ bool Grammar_load(Grammar* grammar, char* content)
   UCC_freeProductionContainer(&allProductions);
 
   freeParser(&parser);
-  Lexer_destroy(&lexer);
+  Lexer_clean(&lexer);
   return ret;
 }
 
@@ -80,6 +80,7 @@ TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored)
 
   int index = grammar->tokenCount++;
   strcpy(grammar->tokens[index].name, name);
+  grammar->tokens[index].index = index;
   grammar->tokens[index].ignored = ignored;
   grammar->tokens[index].stateMachine = StateMachine_create();
 
@@ -143,11 +144,13 @@ ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 }
 
 
-void Grammar_destroy(Grammar* grammar)
+void Grammar_clean(Grammar* grammar)
 {
   if(grammar->errorMessage) delete(grammar->errorMessage);
   for(int i = 0; i < grammar->tokenCount; i++)
   {
-    StateMachine_destroy(&grammar->tokens[i].stateMachine);
+    StateMachine_clean(&grammar->tokens[i].stateMachine);
   }
+
+  memset(grammar, 0, sizeof(Grammar));
 }

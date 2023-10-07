@@ -61,7 +61,7 @@ int main(int numArgs, char** args)
 
   if(ret == OK && strcmp(args[2], "-token") == 0) testToken(&grammar, args[3]);
 
-  Grammar_destroy(&grammar);
+  Grammar_clean(&grammar);
   delete(fileContent);
 
   if(ret == OK && leakCount()) ret = MEMORY_LEAK;

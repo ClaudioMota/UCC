@@ -18,6 +18,7 @@ struct Helper
 
 struct TokenExpr
 {
+  int index;
   char name[STRING_LENGTH];
   bool ignored;
   StateMachine stateMachine;
@@ -57,6 +58,6 @@ Helper* Grammar_getHelper(Grammar* grammar, char* name);
 TokenExpr* Grammar_getToken(Grammar* grammar, char* name);
 ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name);
 ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name);
-void Grammar_destroy(Grammar* grammar);
+void Grammar_clean(Grammar* grammar);
 
 #endif

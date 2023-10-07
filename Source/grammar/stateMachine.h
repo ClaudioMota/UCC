@@ -8,8 +8,6 @@ typedef struct StateMachine StateMachine;
 typedef struct StateMachineTransition StateMachineTransition;
 typedef struct StateMachineState StateMachineState;
 
-#define STATE_MACHINE_MAX_STATES 1024
-
 struct StateMachineTransition
 {
   bool values[SUPPORTED_CHARACTERS];
@@ -21,12 +19,12 @@ struct StateMachineState
   int index;
   int transitionCount;
   bool accepted;
-  StateMachineTransition transitions[STATE_MACHINE_MAX_STATES];
+  StateMachineTransition transitions[SUPPORTED_CHARACTERS];
 };
 
 struct StateMachine
 {
-  int stateCount;
+  int stateCount, stateCapacity;
   StateMachineState** states;
   StateMachineState* start;
 };
@@ -43,6 +41,6 @@ StateMachineState* StateMachine_step(StateMachineState* state, unsigned char inp
 
 void StateMachine_print(StateMachine* stateMachine);
 
-void StateMachine_destroy(StateMachine* stateMachine);
+void StateMachine_clean(StateMachine* stateMachine);
 
 #endif

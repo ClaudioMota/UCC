@@ -9,6 +9,7 @@
 #define SUPPORTED_CHARACTERS 256
 #define STRING_LENGTH 64
 #define MAX_PRODUCTION_LENGTH 16
+#define INITIAL_CAPACITY 64
 
 #ifndef nullptr
 #define nullptr 0
