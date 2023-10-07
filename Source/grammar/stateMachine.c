@@ -1,4 +1,4 @@
-#include "stateMachine.h"
+#include "grammar/stateMachine.h"
 
 #include <stdio.h>
 
@@ -27,7 +27,7 @@ struct CompoundState
 static void doCreate(StateMachine* stateMachine)
 {
   memset(stateMachine, 0, sizeof(StateMachine));
-  stateMachine->states = malloc(sizeof(StateMachineState*)*STATE_MACHINE_MAX_STATES);
+  stateMachine->states = new(sizeof(StateMachineState*)*STATE_MACHINE_MAX_STATES);
 }
 
 StateMachine StateMachine_create()
@@ -43,7 +43,7 @@ StateMachineState* StateMachine_createState(StateMachine* stateMachine)
   if(stateMachine->stateCount >= STATE_MACHINE_MAX_STATES) return nullptr;
   int index = stateMachine->stateCount++;
   
-  StateMachineState* ret = malloc(sizeof(StateMachineState));
+  StateMachineState* ret = new(sizeof(StateMachineState));
   memset(ret, 0, sizeof(StateMachineState));
 
   stateMachine->states[index] = ret;
@@ -190,7 +190,7 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
 {
   int deterministicStateCount = 0;
   CompoundState* compoundStateMapper[STATE_MACHINE_MAX_STATES];
-  CompoundState* deterministicStates = malloc(sizeof(CompoundState)*STATE_MACHINE_MAX_STATES);
+  CompoundState* deterministicStates = new(sizeof(CompoundState)*STATE_MACHINE_MAX_STATES);
   memset(compoundStateMapper, 0, sizeof(compoundStateMapper));
   memset(deterministicStates, 0, sizeof(deterministicStates));
 
@@ -239,7 +239,7 @@ void StateMachine_makeDeterministic(StateMachine* stateMachine)
 
   replaceWithDeterministicStates(stateMachine, deterministicStates, deterministicStateCount);
 
-  free(deterministicStates);
+  delete(deterministicStates);
 }
 
 StateMachineState* StateMachine_step(StateMachineState* state, unsigned char input)
@@ -270,6 +270,6 @@ void StateMachine_print(StateMachine* stateMachine)
 void StateMachine_destroy(StateMachine* stateMachine)
 {
   for(int i = 0; i < stateMachine->stateCount; i++)
-    free(stateMachine->states[i]);
-  free(stateMachine->states);
+    delete(stateMachine->states[i]);
+  delete(stateMachine->states);
 }

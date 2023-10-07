@@ -5,7 +5,7 @@
 #include "parsers/ucc/production.h"
 #include "parsers/ucc/productions.h"
 
-#include "grammar.h"
+#include "grammar/grammar.h"
 
 static inline UCCProduction* uccProduction(Production* prod){ return (UCCProduction*)prod; }
 

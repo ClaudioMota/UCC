@@ -5,6 +5,9 @@
 #include "parsers/parser.h"
 #include "parsers/lexer.h"
 
+void* new(long long size);
+void delete(void* p);
+
 static const int START_STACK_SIZE = 1024;
 static const int MAX_PARSERS_OPTIONS = 64000;
 static const int END_OF_INPUT = -1;
@@ -25,7 +28,7 @@ struct AllParsers
 
 Token* newToken()
 {
-  Token* token = malloc(sizeof(Token));
+  Token* token = new(sizeof(Token));
   memset(token, 0, sizeof(Token));
   return token;
 }
@@ -33,17 +36,17 @@ Token* newToken()
 static Parser* createParser(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), AllParsers* allParsers)
 {
   allParsers->parserCount = 0;
-  allParsers->parsers = malloc(MAX_PARSERS_OPTIONS*sizeof(Parser));
+  allParsers->parsers = new(MAX_PARSERS_OPTIONS*sizeof(Parser));
   Parser* ret = &allParsers->parsers[allParsers->parserCount++];
 
   ret->pos = 0;
   ret->stackSize = START_STACK_SIZE;
   
   int size = (ret->stackSize+1)*sizeof(int);
-  ret->stateStack = malloc(size);
+  ret->stateStack = new(size);
   memset(ret->stateStack, 0, size);
   size = (ret->stackSize+1)*sizeof(ProductionNode);
-  ret->nodesStack = malloc(size);
+  ret->nodesStack = new(size);
   memset(ret->nodesStack, 0, size);
   ret->nextOption = nullptr;
   ret->hasError = false;
@@ -71,8 +74,8 @@ static Parser* createParserOption(Parser* old)
   newParser->hasError = old->hasError;
   newParser->token = old->token;
 
-  newParser->stateStack = malloc((newParser->stackSize+1) * sizeof(int));
-  newParser->nodesStack = malloc((newParser->stackSize+1) * sizeof(ProductionNode));
+  newParser->stateStack = new((newParser->stackSize+1) * sizeof(int));
+  newParser->nodesStack = new((newParser->stackSize+1) * sizeof(ProductionNode));
   newParser->allParsers = old->allParsers;
   newParser->productionCreator = old->productionCreator;
   newParser->allProductions = old->allProductions;
@@ -396,8 +399,8 @@ bool visitNodes(Production* production, VisitData* visitData, VisitFunction visi
 
 void freeParser(Parser* parser)
 {
-  free(parser->nodesStack);
-  free(parser->stateStack);
+  delete(parser->nodesStack);
+  delete(parser->stateStack);
 }
 
 static void freeOtherParsers(Parser* parser)
@@ -410,7 +413,7 @@ static void freeOtherParsers(Parser* parser)
       freeParser(&all->parsers[i]);
     }
   }
-  free(all->parsers);
+  delete(all->parsers);
 }
 
 Parser parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), State* states, int (*goToTable)(int, int), Token* token)

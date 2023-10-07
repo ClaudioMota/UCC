@@ -16,6 +16,12 @@
 
 typedef struct Token Token;
 
+void* new(long long size);
+
+void delete(void* pointer);
+
+int leakCount();
+
 // Retrieves the a string with the content of the given file
 // When not NULL the content must be freed aftwards
 char* readFile(char* path);

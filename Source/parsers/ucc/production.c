@@ -4,7 +4,7 @@
 
 Production* UCC_createProduction(AllProductions* allProductions)
 {
-  UCCProduction* ret = malloc(sizeof(UCCProduction));
+  UCCProduction* ret = new(sizeof(UCCProduction));
   memset(ret, 0, sizeof(UCCProduction));
   ret->next = allProductions->last;
   allProductions->last = ret;
@@ -13,7 +13,7 @@ Production* UCC_createProduction(AllProductions* allProductions)
 
 void UCC_deleteProduction(UCCProduction* prod)
 {
-  free(prod);
+  delete(prod);
 }
 
 AllProductions UCC_createProductionContainer()

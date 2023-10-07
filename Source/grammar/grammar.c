@@ -1,4 +1,4 @@
-#include "grammar.h"
+#include "grammar/grammar.h"
 #include "parsers/lexer.h"
 #include "parsers/ucc/production.h"
 #include "parsers/ucc/productions.h"
@@ -145,7 +145,7 @@ ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 
 void Grammar_destroy(Grammar* grammar)
 {
-  if(grammar->errorMessage) free(grammar->errorMessage);
+  if(grammar->errorMessage) delete(grammar->errorMessage);
   for(int i = 0; i < grammar->tokenCount; i++)
   {
     StateMachine_destroy(&grammar->tokens[i].stateMachine);

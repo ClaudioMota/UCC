@@ -2,7 +2,7 @@
 #define GRAMMAR_HEADER 1
 
 #include "basics.h"
-#include "stateMachine.h"
+#include "grammar/stateMachine.h"
 
 typedef struct Grammar Grammar;
 typedef struct Helper Helper;

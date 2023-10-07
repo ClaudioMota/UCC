@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 
+void* new(long long size);
+void delete(void* p);
+
 // Process each step of the lexer parse
 static LexerState step(int input, Lexer* lexer);
 
@@ -14,7 +17,7 @@ Lexer Lexer_create(int stateFunctionsCount, int (**stateFunctions)(int* state, i
   memset(&ret, 0, sizeof(ret));
   ret.stateFunctionsCount = stateFunctionsCount;
   ret.stateFunctions = stateFunctions;
-  ret.states = malloc(sizeof(int)*stateFunctionsCount);
+  ret.states = new(sizeof(int)*stateFunctionsCount);
   memset(ret.states, 0, sizeof(int)*stateFunctionsCount);
   ret.lastAcceptedFunction = -1;
   ret.ignoreCheckFunction = ignoreFunction;
@@ -67,7 +70,7 @@ void Lexer_parse(Lexer* lexer, char* string)
 
 void Lexer_destroy(Lexer* lexer)
 {
-  if(lexer->states) free(lexer->states);
+  if(lexer->states) delete(lexer->states);
   if(lexer->tokens) Token_destroy(lexer->tokens);
 }
 
@@ -82,7 +85,7 @@ Token Token_create(int type, char* string, int startIndex, int length, int start
   ret.index = startIndex;
   ret.length = length;
 
-  ret.content = malloc(length+1);
+  ret.content = new(length+1);
   ret.content[length] = '\0';
   memcpy(ret.content, string + startIndex, length);
 
@@ -95,8 +98,8 @@ void Token_destroy(Token* token)
   {
     Token* aux = token;
     token = token->next;
-    if(aux->content) free(aux->content);
-    free(aux);
+    if(aux->content) delete(aux->content);
+    delete(aux);
   }
 }
 
@@ -138,7 +141,7 @@ static int createToken(Lexer* lexer, char* string, int startIndex, int startLine
     length = lastAcceptedIndex - startIndex + 1;
   }
 
-  Token* token = malloc(sizeof(Token));
+  Token* token = new(sizeof(Token));
   *token = Token_create(type, string, startIndex, length, startLine, startColumn);
   token->ignored = lexer->ignoreCheckFunction(token);
   if(lexer->lastToken)

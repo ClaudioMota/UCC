@@ -1,11 +1,12 @@
 #include<stdio.h>
-#include "grammar.h"
+#include "grammar/grammar.h"
 
 enum ReturnCodes
 {
   OK,
   PARAM_ERROR,
-  COMPILE_ERROR
+  COMPILE_ERROR,
+  MEMORY_LEAK
 };
 
 int showHelp()
@@ -61,7 +62,9 @@ int main(int numArgs, char** args)
   if(ret == OK && strcmp(args[2], "-token") == 0) testToken(&grammar, args[3]);
 
   Grammar_destroy(&grammar);
-  free(fileContent);
+  delete(fileContent);
+
+  if(ret == OK && leakCount()) ret = MEMORY_LEAK;
 
   printf("finished with code %i\n", ret);
 

@@ -1,7 +1,27 @@
 #include "basics.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <parsers/lexer.h>
+
+static int allocs = 0;
+
+void* new(long long size)
+{
+  allocs++;
+  return malloc(size);
+}
+
+void delete(void* pointer)
+{
+  allocs--;
+  free(pointer);
+}
+
+int leakCount()
+{
+  return allocs;
+}
 
 char* readFile(char* path)
 {
@@ -10,7 +30,7 @@ char* readFile(char* path)
   fseek(file, 0, SEEK_END);
   long long size = ftell(file);
   rewind(file);
-  char* ret = malloc(size + 1);
+  char* ret = new(size + 1);
   ret[size] = '\0';
   fread(ret, 1, size, file);
   return ret;
