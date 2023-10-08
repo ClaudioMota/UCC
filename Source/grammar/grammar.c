@@ -12,7 +12,7 @@ bool UCC_shouldIgnore(Token* token);
 
 Grammar Grammar_create()
 {
-  Grammar ret;;
+  Grammar ret;
   memset(&ret, 0, sizeof(Grammar));
   return ret;
 }
@@ -64,7 +64,7 @@ bool Grammar_load(Grammar* grammar, char* content)
 
 Helper* Grammar_declareHelper(Grammar* grammar, char* name)
 {
-  if(grammar->helperCount >= ELEMENTS_MAX) return nullptr;
+  if(grammar->helperCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
   if(Grammar_getHelper(grammar, name)) return nullptr;
 
   int index = grammar->helperCount++;
@@ -74,7 +74,7 @@ Helper* Grammar_declareHelper(Grammar* grammar, char* name)
 
 TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored)
 {
-  if(grammar->tokenCount >= ELEMENTS_MAX) return nullptr;
+  if(grammar->tokenCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
   if(Grammar_getHelper(grammar, name)) return nullptr;
   if(Grammar_getToken(grammar, name)) return nullptr;
 
@@ -87,20 +87,47 @@ TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored)
   return &grammar->tokens[index];
 }
 
+static ProductionExpr* findOrCreateProduction(Grammar* grammar, char* name)
+{
+  ProductionExpr* prodExpr = Grammar_getProduction(grammar, name);
+  
+  if(!prodExpr)
+  {
+    if(grammar->productionCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
+    int index = grammar->productionCount++;
+    prodExpr = &grammar->productions[index];
+
+    if(!prodExpr->options)
+    {
+      prodExpr->options = new(sizeof(ProductionOption)*GRAMMAR_ELEMENTS_MAX);
+      memset(prodExpr->options, 0, sizeof(ProductionOption)*GRAMMAR_ELEMENTS_MAX);
+    }
+    
+    strcpy(prodExpr->name, name);
+  }
+
+  return prodExpr;
+}
+
 ProductionExpr* Grammar_addProduction(Grammar* grammar, char* name, int stepCount, char** steps)
 {
-  if(grammar->productionCount >= ELEMENTS_MAX) return nullptr;
   if(Grammar_getHelper(grammar, name)) return nullptr;
   if(Grammar_getToken(grammar, name)) return nullptr;
 
-  int index = grammar->productionCount++;
-  grammar->productions[index].stepCount = stepCount;
+  ProductionExpr* prodExpr = findOrCreateProduction(grammar, name);
+  if(!prodExpr || prodExpr->optionCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
+  ProductionOption* production = &prodExpr->options[prodExpr->optionCount++];
+
+  production->stepCount = stepCount;
 
   for(int i = 0; i < stepCount; i++)
-    strcpy(grammar->productions[index].steps[i], steps[i]);
+  {
+    production->steps[i].token = Grammar_getToken(grammar, steps[i]);
+    if(!production->steps[i].token)
+      production->steps[i].production = findOrCreateProduction(grammar, steps[i]);
+  }
 
-  strcpy(grammar->productions[index].name, name);
-  return &grammar->productions[index];
+  return prodExpr;
 }
 
 ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to, bool array);
@@ -123,7 +150,6 @@ TokenExpr* Grammar_getToken(Grammar* grammar, char* name)
   return nullptr;
 }
 
-
 ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name)
 {
   for(int i = 0; i < grammar->productionCount; i++)
@@ -132,7 +158,6 @@ ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name)
 
   return nullptr;
 }
-
 
 ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 {
@@ -146,11 +171,11 @@ ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 
 void Grammar_clean(Grammar* grammar)
 {
-  if(grammar->errorMessage) delete(grammar->errorMessage);
   for(int i = 0; i < grammar->tokenCount; i++)
-  {
     StateMachine_clean(&grammar->tokens[i].stateMachine);
-  }
+  
+  for(int i = 0; i < grammar->productionCount; i++)
+    delete(grammar->productions[i].options);
 
   memset(grammar, 0, sizeof(Grammar));
 }

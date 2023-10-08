@@ -8,6 +8,8 @@ typedef struct Grammar Grammar;
 typedef struct Helper Helper;
 typedef struct TokenExpr TokenExpr;
 typedef struct ProductionExpr ProductionExpr;
+typedef struct ProductionOption ProductionOption;
+typedef struct ProductionStep ProductionStep;
 typedef struct ReducerExpr ReducerExpr;
 
 struct Helper
@@ -24,11 +26,23 @@ struct TokenExpr
   StateMachine stateMachine;
 };
 
+struct ProductionStep
+{
+  TokenExpr* token;
+  ProductionExpr* production;
+};
+
+struct ProductionOption
+{
+  int stepCount;
+  ProductionStep steps[MAX_PRODUCTION_LENGTH];
+};
+
 struct ProductionExpr
 {
   char name[STRING_LENGTH];
-  int stepCount;
-  char steps[MAX_PRODUCTION_LENGTH][STRING_LENGTH];
+  int optionCount;
+  ProductionOption* options;
 };
 
 struct ReducerExpr
@@ -41,11 +55,10 @@ struct ReducerExpr
 struct Grammar
 {
   int helperCount, tokenCount, productionCount, reducerCount;
-  Helper helpers[ELEMENTS_MAX];
-  TokenExpr tokens[ELEMENTS_MAX];
-  ProductionExpr productions[ELEMENTS_MAX];
-  ReducerExpr reducers[ELEMENTS_MAX];
-  char* errorMessage;
+  Helper helpers[GRAMMAR_ELEMENTS_MAX];
+  TokenExpr tokens[GRAMMAR_ELEMENTS_MAX];
+  ProductionExpr productions[GRAMMAR_ELEMENTS_MAX];
+  ReducerExpr reducers[GRAMMAR_ELEMENTS_MAX];
 };
 
 Grammar Grammar_create();

@@ -10,7 +10,10 @@ LalrMachine LalrMachine_create(Grammar* grammar)
   memset(&ret, 0, sizeof(LalrMachine));
   ret.grammar = grammar;
   ret.start = LalrMachine_createState(&ret, nullptr, 0);
-  LalrState_createItem(ret.start, &grammar->productions[0], 0);
+  
+  ProductionExpr* prodExpr = &grammar->productions[0];
+  for(int i = 0; i < prodExpr->optionCount; i++)
+    LalrState_createItem(ret.start, &prodExpr->options[i], 0);
 
   return ret;
 }
@@ -37,7 +40,7 @@ LalrState* LalrMachine_createState(LalrMachine* stateMachine, LalrItem** baseIte
   return state;
 }
 
-LalrItem* LalrState_createItem(LalrState* state, ProductionExpr* production, int position)
+LalrItem* LalrState_createItem(LalrState* state, ProductionOption* production, int position)
 {
   if(state->itemCount >= state->itemCapacity)
   {

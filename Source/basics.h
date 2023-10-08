@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ELEMENTS_MAX 1024
+#define GRAMMAR_ELEMENTS_MAX 1024
 #define SUPPORTED_CHARACTERS 256
 #define STRING_LENGTH 64
 #define MAX_PRODUCTION_LENGTH 16

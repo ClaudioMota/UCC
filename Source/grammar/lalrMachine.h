@@ -2,21 +2,19 @@
 #define LALR_HEADER 1
 
 #include "basics.h"
+#include "grammar/grammar.h"
 
-typedef struct Token Token;
-typedef struct ProductionExpr ProductionExpr;
-typedef struct Grammar Grammar;
 typedef struct LalrItem LalrItem;
 typedef struct LalrState LalrState;
 typedef struct LalrMachine LalrMachine;
 
-#define LALR_LOOKAHEAD_EOF_INDEX ELEMENTS_MAX
+#define LALR_LOOKAHEAD_EOF_INDEX GRAMMAR_ELEMENTS_MAX
 
 struct LalrItem
 {
-  ProductionExpr* production;
+  ProductionOption* production;
   int position;
-  int lookaheadIndex[ELEMENTS_MAX + 1];
+  int lookaheadIndex[GRAMMAR_ELEMENTS_MAX + 1];
 };
 
 struct LalrState
@@ -38,7 +36,7 @@ LalrMachine LalrMachine_create(Grammar* grammar);
 
 LalrState* LalrMachine_createState(LalrMachine* stateMachine, LalrItem** baseItems, int baseItemsCount);
 
-LalrItem* LalrState_createItem(LalrState* state, ProductionExpr* production, int position);
+LalrItem* LalrState_createItem(LalrState* state, ProductionOption* production, int position);
 
 LalrState* LalrMachine_step(LalrState* state, Token* input);
 

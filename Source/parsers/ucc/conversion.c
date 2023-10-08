@@ -268,7 +268,7 @@ static bool visitProduction(ucc_Production_identifier_attrib_Expr_semicolon* pro
 
   if(ret)
   {
-    Production* prods[ELEMENTS_MAX];
+    Production* prods[GRAMMAR_ELEMENTS_MAX];
     int prodsCount = getInlineProductions(production->Expr2.production, prods);
     for(int i = 0; i < prodsCount; i++)
     {
