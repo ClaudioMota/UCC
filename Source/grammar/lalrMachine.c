@@ -9,7 +9,10 @@ static void printState(LalrState* state)
 {
   for(int i = 0; i < state->itemCount; i++)
   {
-    printf(" %s -> ", state->items[i].production->base->name);
+    if(state->items[i].production->base)
+      printf(" %s -> ", state->items[i].production->base->name);
+    else
+      printf(" -> ");
     for(int j = 0; j <= state->items[i].production->stepCount; j++)
     {
       if(j == state->items[i].position) printf(". ");
@@ -84,13 +87,15 @@ static int maybeAddToken(TokenExpr** tokens, int size, TokenExpr* value)
   return size;
 }
 
-static int getFirstTokens(TokenExpr** tokens, int size, ProductionExpr* production)
+static int getFirstTokens(TokenExpr** tokens, int size, ProductionExpr* production, bool* reached)
 {
+  if(reached[production->index]) return size;
+  reached[production->index] = true;
   for(int i = 0; i < production->optionCount; i++)
   {
     ProductionStep* step = &production->options[i].steps[0];
     if(step->token) size = maybeAddToken(tokens, size, step->token);
-    else if(step->production != production) size = getFirstTokens(tokens, size, step->production);
+    else if(step->production != production) size = getFirstTokens(tokens, size, step->production, reached);
   }
 
   return size;
@@ -108,7 +113,11 @@ static int getLookahead(TokenExpr** lookahead, LalrItem* item)
     ProductionStep* step = &item->production->steps[item->position + 1];
     if(step->token) count = maybeAddToken(lookahead, count, step->token);
     else
-      count = getFirstTokens(lookahead, count, step->production);
+    {
+      bool reached[GRAMMAR_ELEMENTS_MAX];
+      memset(reached, 0, sizeof(reached));
+      count = getFirstTokens(lookahead, count, step->production, reached);
+    }
   }
 
   return count;
@@ -300,7 +309,7 @@ LalrState* LalrMachine_createState(LalrMachine* stateMachine, LalrItem** baseIte
   LalrState* state = stateMachine->states[stateMachine->stateCount];
   memset(state, 0, sizeof(LalrState));
   state->index = stateMachine->stateCount++;
-
+  
   for(int i = 0; i < baseItemCount; i++)
     LalrState_createItem(state, baseItems[i]->production, baseItems[i]->position, baseItems[i]->lookahead, baseItems[i]->lookaheadCount);
 

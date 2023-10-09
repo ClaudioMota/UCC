@@ -96,6 +96,7 @@ static ProductionExpr* findOrCreateProduction(Grammar* grammar, char* name)
     if(grammar->productionCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
     int index = grammar->productionCount++;
     prodExpr = &grammar->productions[index];
+    prodExpr->index = index;
 
     if(!prodExpr->options)
     {

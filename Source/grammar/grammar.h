@@ -41,6 +41,7 @@ struct ProductionOption
 
 struct ProductionExpr
 {
+  int index;
   char name[STRING_LENGTH];
   int optionCount;
   ProductionOption* options;
