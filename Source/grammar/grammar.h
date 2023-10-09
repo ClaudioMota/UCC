@@ -35,6 +35,7 @@ struct ProductionStep
 struct ProductionOption
 {
   int stepCount;
+  ProductionExpr* base;
   ProductionStep steps[MAX_PRODUCTION_LENGTH];
 };
 

@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include "grammar/grammar.h"
+#include "grammar/lalrMachine.h"
 
 enum ReturnCodes
 {
@@ -25,6 +26,12 @@ int compile(Grammar* grammar, char* fileContent)
 { 
   if(!Grammar_load(grammar, fileContent)) return COMPILE_ERROR;
   
+  LalrMachine lalrMachine = LalrMachine_create(grammar);
+
+  LalrMachine_print(&lalrMachine);
+
+  LalrMachine_clean(&lalrMachine);
+
   return OK;
 }
 

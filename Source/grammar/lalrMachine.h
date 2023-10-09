@@ -5,23 +5,34 @@
 #include "grammar/grammar.h"
 
 typedef struct LalrItem LalrItem;
+typedef struct LalrTransition LalrTransition;
 typedef struct LalrState LalrState;
 typedef struct LalrMachine LalrMachine;
 
-#define LALR_LOOKAHEAD_EOF_INDEX GRAMMAR_ELEMENTS_MAX
+#define LALR_LOOKAHEAD_EOF nullptr
 
 struct LalrItem
 {
   ProductionOption* production;
   int position;
-  int lookaheadIndex[GRAMMAR_ELEMENTS_MAX + 1];
+  int lookaheadCount;
+  TokenExpr* lookahead[GRAMMAR_ELEMENTS_MAX + 1];
+};
+
+struct LalrTransition
+{
+  LalrState* target;
+  TokenExpr* token;
+  ProductionExpr* production;
 };
 
 struct LalrState
 {
   int index;
   int itemCount, itemCapacity;
+  int transitionCount, transitionCapacity;
   LalrItem* items;
+  LalrTransition* transitions;
 };
 
 struct LalrMachine
@@ -30,18 +41,15 @@ struct LalrMachine
   int stateCount, stateCapacity;
   LalrState** states;
   LalrState* start;
+  ProductionOption bootstrap;
 };
 
 LalrMachine LalrMachine_create(Grammar* grammar);
 
-LalrState* LalrMachine_createState(LalrMachine* stateMachine, LalrItem** baseItems, int baseItemsCount);
-
-LalrItem* LalrState_createItem(LalrState* state, ProductionOption* production, int position);
-
 LalrState* LalrMachine_step(LalrState* state, Token* input);
 
-void LalrState_clean(LalrState* state);
+void LalrMachine_print(LalrMachine* lalrMachine);
 
-void LalrMachine_clean(LalrMachine* stateMachine);
+void LalrMachine_clean(LalrMachine* lalrMachine);
 
 #endif

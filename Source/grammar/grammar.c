@@ -118,6 +118,7 @@ ProductionExpr* Grammar_addProduction(Grammar* grammar, char* name, int stepCoun
   if(!prodExpr || prodExpr->optionCount >= GRAMMAR_ELEMENTS_MAX) return nullptr;
   ProductionOption* production = &prodExpr->options[prodExpr->optionCount++];
 
+  production->base = prodExpr;
   production->stepCount = stepCount;
 
   for(int i = 0; i < stepCount; i++)
