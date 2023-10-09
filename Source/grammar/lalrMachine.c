@@ -5,6 +5,36 @@
 #include <string.h>
 #include <stdio.h>
 
+static void printState(LalrState* state)
+{
+  for(int i = 0; i < state->itemCount; i++)
+  {
+    printf(" %s -> ", state->items[i].production->base->name);
+    for(int j = 0; j <= state->items[i].production->stepCount; j++)
+    {
+      if(j == state->items[i].position) printf(". ");
+      if(j < state->items[i].production->stepCount)
+      {
+        ProductionStep* step = &state->items[i].production->steps[j];
+        if(step->token) printf("%s ", step->token->name);
+        if(step->production) printf("%s ", step->production->name);
+      }
+    }
+
+    printf("(%p), ", state->items[i].production);
+    for(int j = 0; j < state->items[i].lookaheadCount; j++)
+      if(!state->items[i].lookahead[j]) printf("$ ");
+      else printf("%s ", state->items[i].lookahead[j]->name);
+
+    if(i < state->transitionCount)
+    { 
+      LalrTransition* t = &state->transitions[i];
+      printf("| %s -> %i", t->token ? t->token->name : t->production->name,  state->transitions[i].target->index);
+    }
+    printf("\n");
+  }
+}
+
 static LalrState* LalrMachine_createState(LalrMachine* stateMachine, LalrItem** baseItems, int baseItemsCount);
 
 static LalrItem* LalrState_createItem(LalrState* state, ProductionOption* production, int position, TokenExpr** lookahead, int lookaheadCount);
@@ -18,7 +48,7 @@ static bool isTokenListEqual(TokenExpr** a, int sizeA, TokenExpr** b, int sizeB)
   for(int i = 0; i < sizeA; i++)
   {
     bool present = false;
-    for(int j = 0; j < sizeA; j++)
+    for(int j = 0; j < sizeB; j++)
       if(a[i] == b[j]) present = true;
 
     if(!present) return false;
@@ -29,18 +59,20 @@ static bool isTokenListEqual(TokenExpr** a, int sizeA, TokenExpr** b, int sizeB)
 
 static LalrItem* findItem(LalrState* state, ProductionOption* productionOption, int position, TokenExpr** lookahead, int lookaheadCount)
 {
-  LalrItem* item = nullptr;
+  LalrItem* found = nullptr;
   for(int i = 0; i < state->itemCount; i++)
   {
-    item = &state->items[i];
-    if(item->production != productionOption || item->position != position)
-      item = nullptr;
+    LalrItem* item = &state->items[i];
+    if(item->production == productionOption && item->position == position)
+    {
+      if(lookahead && !isTokenListEqual(lookahead, lookaheadCount, item->lookahead, item->lookaheadCount))
+        continue;
+      found = item;
+      break;
+    }
   }
 
-  if(item != nullptr && lookahead != nullptr && !isTokenListEqual(lookahead, lookaheadCount, item->lookahead, item->lookaheadCount))
-    return nullptr;
-
-  return item;
+  return found;
 }
 
 static int maybeAddToken(TokenExpr** tokens, int size, TokenExpr* value)
@@ -96,9 +128,12 @@ static void expandItem(LalrState* state, LalrItem* item)
 
   for(int i = 0; i < currentProd->optionCount; i++)
   {
-    LalrItem* existing = findItem(state, &currentProd->options[i], 0, lookahead, lookaheadCount);
+    LalrItem* existing = findItem(state, &currentProd->options[i], 0, nullptr, lookaheadCount);
     if(!existing)
-      LalrState_createItem(state, &currentProd->options[i], 0, lookahead, lookaheadCount);
+      existing = LalrState_createItem(state, &currentProd->options[i], 0, lookahead, lookaheadCount);
+    if(!isTokenListEqual(lookahead, lookaheadCount, existing->lookahead, existing->lookaheadCount));
+      for(int l = 0; l < lookaheadCount; l++)
+        existing->lookaheadCount = maybeAddToken(existing->lookahead, existing->lookaheadCount, lookahead[l]);
   }
 }
 
@@ -120,7 +155,7 @@ static LalrState* findState(LalrMachine* stateMachine, LalrItem** baseItems, int
   {
     bool allPresent = true;
     for(int j = 0; j < baseItemCount; j++)
-      if(!findItem(stateMachine->states[i], baseItems[j]->production, baseItems[j]->position, baseItems[j]->lookahead, baseItems[j]->lookaheadCount))
+      if(!findItem(stateMachine->states[i], baseItems[j]->production, baseItems[j]->position, nullptr, baseItems[j]->lookaheadCount))
         allPresent = false;
     
     if(allPresent) candidates[candidateCount++] = stateMachine->states[i];
@@ -139,7 +174,7 @@ static LalrState* findState(LalrMachine* stateMachine, LalrItem** baseItems, int
 
       bool allPresent = true;
       for(int j = 0; j < state.itemCount; j++)
-        if(!findItem(stateMachine->states[i], items[j].production, items[j].position, items[j].lookahead, items[j].lookaheadCount))
+        if(!findItem(candidates[i], items[j].production, items[j].position, items[j].lookahead, items[j].lookaheadCount))
           allPresent = false;
 
       if(allPresent)
@@ -212,6 +247,7 @@ static void createTransitions(LalrMachine* stateMachine, LalrState* state)
 
     LalrState* target = findState(stateMachine, baseItems, baseItemCount);
     if(!target) target = LalrMachine_createState(stateMachine, baseItems, baseItemCount);
+    addTransition(state, target, expectedToken, expectedProd);
   }
 
   delete(newItems);
@@ -226,6 +262,7 @@ LalrMachine LalrMachine_create(Grammar* grammar)
   if(grammar->productionCount > 0)
   {
     LalrItem bootstrapItem;
+    memset(&bootstrapItem, 0, sizeof(LalrItem));
     bootstrapItem.production = &ret.bootstrap;
     bootstrapItem.position = 0;
     bootstrapItem.lookaheadCount = 1;
@@ -233,14 +270,14 @@ LalrMachine LalrMachine_create(Grammar* grammar)
 
     ret.bootstrap.stepCount = 1;
     ret.bootstrap.base = nullptr;
+    ret.bootstrap.steps[0].token = nullptr;
     ret.bootstrap.steps[0].production = &grammar->productions[0];
 
     LalrItem* items[1] = {&bootstrapItem};
     ret.start = LalrMachine_createState(&ret, items, 1);
 
-    // for(int i = 0; i < ret.stateCount; i++)
-    printf("A\n");
-    createTransitions(&ret, ret.states[0]);
+    for(int i = 0; i < ret.stateCount; i++)
+      createTransitions(&ret, ret.states[i]);
   }
 
   return ret;
@@ -299,26 +336,7 @@ void LalrMachine_print(LalrMachine* lalrMachine)
   {
     LalrState* state = lalrMachine->states[s];
     printf("%i:", state->index);
-    for(int i = 0; i < state->itemCount; i++)
-    {
-      printf(" %s -> ", state->items[i].production->base->name);
-      for(int j = 0; j < state->items[i].production->stepCount; j++)
-      {
-        ProductionStep* step = &state->items[i].production->steps[j];
-        if(j == state->items[i].position) printf(". ");
-        if(step->token) printf("%s ", step->token->name);
-        if(step->production) printf("%s ", step->production->name);
-      }
-
-      printf(", ");
-      for(int j = 0; j < state->items[i].lookaheadCount; j++)
-        if(!state->items[i].lookahead[j]) printf(" $ ");
-        else printf(" %s ", state->items[i].lookahead[j]->name);
-
-      if(i < state->transitionCount)
-        printf("| -> %i", state->transitions[i].target->index);
-      printf("\n");
-    }
+    printState(state);
   }
 }
 
