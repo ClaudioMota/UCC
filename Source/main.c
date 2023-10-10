@@ -2,12 +2,14 @@
 #include "grammar/grammar.h"
 #include "parsers/lexer.h"
 #include "grammar/lalrMachine.h"
+#include "generation/generation.h"
 
 enum ReturnCodes
 {
   OK,
   PARAM_ERROR,
   COMPILE_ERROR,
+  GENERATION_ERROR,
   MEMORY_LEAK
 };
 
@@ -121,6 +123,9 @@ int checkCliCommands(int numArgs, char** args, Grammar* grammar, LalrMachine* la
       printf("Grammar:\n");
       LalrMachine_print(lalrMachine);
     }
+    if(strlen(args[i]) > 0)
+      if(!generateLexer(grammar, args[i]))
+        ret = GENERATION_ERROR;
   }
   return ret;
 }

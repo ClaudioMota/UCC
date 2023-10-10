@@ -84,3 +84,12 @@ char* getStringActualContent(char* ret, char* data)
   ret[o] = 0;
   return ret;
 }
+
+
+int mkdir(char*, int);
+
+// TODO multiplatform
+bool createDirectory(char* path)
+{
+  return mkdir(path, 0777) == 0;
+}

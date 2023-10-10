@@ -33,4 +33,6 @@ char* getStringActualContent(char* ret, char* data);
 
 bool failIfNull(void* pointer, char* errorMessage);
 
+bool createDirectory(char* path);
+
 #endif
