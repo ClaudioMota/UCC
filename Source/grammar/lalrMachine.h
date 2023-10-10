@@ -42,14 +42,15 @@ struct LalrMachine
   int stateCount, stateCapacity;
   LalrState** states;
   LalrState* start;
+  LalrState* acceptedState;
   ProductionOption bootstrap;
 };
 
 enum LalrStepResult
 {
+  LALR_STEP_ACCEPTED,
   LALR_STEP_CONTINUE,
   LALR_STEP_REDUCE,
-  LALR_STEP_ACCEPTED,
   LALR_STEP_REDUCE_REDUCE,
   LALR_STEP_SYNTAX_ERROR
 };

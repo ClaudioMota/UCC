@@ -82,7 +82,7 @@ Productions = Productions Production | Production;
 Production = identifier attrib ProductionExpr semicolon;
 ProductionExpr = ProductionFactor0 | ProductionExpr OrOperator ProductionFactor0;
 ProductionFactor0 = ProductionFactor1 | ProductionFactor0 ProductionFactor1;
-ProductionFactor1 = ProductionFactor2 | ProductionFactor1 QuestionOperator;
+ProductionFactor1 = ProductionFactor2 | ProductionFactor2 QuestionOperator;
 ProductionFactor2 = identifier;
 
 QuestionOperator = question;

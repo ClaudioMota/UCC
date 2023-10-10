@@ -75,35 +75,29 @@ int testFile(Grammar* grammar, LalrMachine* lalrMachine, char* filePath)
   memset(&lalrStep, 0, sizeof(LalrStep));
 
   Token token;
-
   while(index < length)
   {
     nextToken(grammar, fileContent, index, length, &token);
     index += token.length;
-    if(token.type == TOKEN_UNKNOWN)
-      printf("UNKNOWN_TOKEN!\n");
-    else
-      printf("%s\n", grammar->tokens[token.type].name);
 
     lalrStep = LalrMachine_step(lalrMachine, lalrStep, &grammar->tokens[token.type]);
     while(lalrStep.result == LALR_STEP_REDUCE)
-    {
-      printf("lalr state: %i\n", lalrStep.stateStack[lalrStep.stackSize-1]->index);
       lalrStep = LalrMachine_step(lalrMachine, lalrStep, &grammar->tokens[token.type]);
-    }
-
-    printf("lalr state: %i\n", lalrStep.stateStack[lalrStep.stackSize-1]->index);
-
+    
     if(lalrStep.result != LALR_STEP_CONTINUE)
-    {
-      printf("Syntax test ended with code %i\n", lalrStep.result);
       break;
-    }
   }
+
+  while(lalrStep.result == LALR_STEP_CONTINUE || lalrStep.result == LALR_STEP_REDUCE)
+  {
+    lalrStep = LalrMachine_step(lalrMachine, lalrStep, nullptr);
+  }
+
+  printf("Syntax test ended with code %i\n", lalrStep.result);
 
   delete(fileContent);
 
-  return OK;
+  return lalrStep.result;
 }
 
 int main(int numArgs, char** args)
@@ -118,10 +112,9 @@ int main(int numArgs, char** args)
   Grammar grammar = Grammar_create();
   int ret = compile(&grammar, fileContent);
   LalrMachine lalrMachine = LalrMachine_create(&grammar);
-  
-  LalrMachine_print(&lalrMachine);
 
-  if(ret == OK && strcmp(args[2], "--test") == 0 && numArgs > 3) testFile(&grammar, &lalrMachine, args[3]);
+  if(ret == OK && strcmp(args[2], "--test") == 0 && numArgs > 3)
+    ret = testFile(&grammar, &lalrMachine, args[3]);
 
   LalrMachine_clean(&lalrMachine);
   Grammar_clean(&grammar);

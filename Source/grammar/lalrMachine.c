@@ -330,6 +330,8 @@ LalrMachine LalrMachine_create(Grammar* grammar)
 
     for(int i = 0; i < ret.stateCount; i++)
       createTransitions(&ret, ret.states[i]);
+
+    ret.acceptedState = ret.states[1];
   }
 
   return ret;
@@ -393,16 +395,17 @@ LalrStep LalrMachine_step(LalrMachine* lalrMachine, LalrStep step, TokenExpr* in
 
   step.result = LALR_STEP_CONTINUE;
   step.reduceCount = 0;
-  if(input->ignored) return step;
+  if(input && input->ignored) return step;
 
   LalrState* state = step.stateStack[step.stackSize-1];
 
-  for(int i = 0; i < state->transitionCount; i++)
-    if(state->transitions[i].token == input)
-    {
-      step.stateStack[step.stackSize++] = state->transitions[i].target;
-      return step;
-    }
+  if(input != nullptr)
+    for(int i = 0; i < state->transitionCount; i++)
+      if(state->transitions[i].token == input)
+      {
+        step.stateStack[step.stackSize++] = state->transitions[i].target;
+        return step;
+      }
 
   for(int i = 0; i < state->itemCount; i++)
     if(state->items[i].position >= state->items[i].production->stepCount)
@@ -427,7 +430,10 @@ LalrStep LalrMachine_step(LalrMachine* lalrMachine, LalrStep step, TokenExpr* in
           return step;
         }
 
-      step.result = LALR_STEP_SYNTAX_ERROR;
+      if(state == lalrMachine->acceptedState)
+        step.result = LALR_STEP_ACCEPTED;
+      else
+        step.result = LALR_STEP_SYNTAX_ERROR;
     }
     break;
     default:

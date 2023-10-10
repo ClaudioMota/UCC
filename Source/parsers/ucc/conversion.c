@@ -245,7 +245,7 @@ static int getProdPossibility(Production* expr, int* index, char** steps, int st
   if(expr->type == ucc_P_Expr_Expr_Op)
   {
     if((*index & 1) == 0) return stepIndex;
-    *index >>= 2;
+    *index >>= 1;
   }
 
   for(int i = 0; i < expr->nodeCount; i++)
