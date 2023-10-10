@@ -13,7 +13,11 @@ enum ReturnCodes
 
 int showHelp()
 {
-  printf("Usage: UCC GRAMAR_FIFE NAMESPACE\n");
+  printf("Usage: ucc GRAMAR_FIFE [NAMESPACE | OPTIONS]\n"
+         "Options:\n"
+         "  --test FILE     Attempts to parse a file using the grammar compiled"
+         "  --print         Shows the state machines for the grammar compiled"
+        );
   return PARAM_ERROR;
 }
 
@@ -100,6 +104,27 @@ int testFile(Grammar* grammar, LalrMachine* lalrMachine, char* filePath)
   return lalrStep.result;
 }
 
+int checkCliCommands(int numArgs, char** args, Grammar* grammar, LalrMachine* lalrMachine)
+{
+  int ret = OK;
+  for(int i = 2; i < numArgs && ret == OK; i++)
+  {
+    if(strcmp(args[i], "--test") == 0 && numArgs > i + 1)
+      ret = testFile(grammar, lalrMachine, args[++i]);
+    if(strcmp(args[i], "--print") == 0)
+    {
+      for(int i = 0; i < grammar->tokenCount; i++)
+      {
+        printf("%s:\n", grammar->tokens[i].name);
+        StateMachine_print(&grammar->tokens[i].stateMachine);
+      }
+      printf("Grammar:\n");
+      LalrMachine_print(lalrMachine);
+    }
+  }
+  return ret;
+}
+
 int main(int numArgs, char** args)
 {
   //return mainOld(numArgs, args);
@@ -113,8 +138,7 @@ int main(int numArgs, char** args)
   int ret = compile(&grammar, fileContent);
   LalrMachine lalrMachine = LalrMachine_create(&grammar);
 
-  if(ret == OK && strcmp(args[2], "--test") == 0 && numArgs > 3)
-    ret = testFile(&grammar, &lalrMachine, args[3]);
+  if(ret == OK) ret = checkCliCommands(numArgs, args, &grammar, &lalrMachine);
 
   LalrMachine_clean(&lalrMachine);
   Grammar_clean(&grammar);
