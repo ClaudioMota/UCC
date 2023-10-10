@@ -123,12 +123,13 @@ static int getLookahead(TokenExpr** lookahead, LalrItem* item)
   return count;
 }
 
-static void expandItem(LalrState* state, LalrItem* item)
+static bool expandItem(LalrState* state, LalrItem* item)
 {
-  if(item->position >= item->production->stepCount) return;
+  if(item->position >= item->production->stepCount) return false;
   ProductionExpr* currentProd = item->production->steps[item->position].production;
-  if(!currentProd) return;
+  if(!currentProd) return false;
 
+  bool changedLookahead = false;
   int lookaheadCount;
   TokenExpr* lookahead[GRAMMAR_ELEMENTS_MAX + 1];
   
@@ -138,18 +139,33 @@ static void expandItem(LalrState* state, LalrItem* item)
   for(int i = 0; i < currentProd->optionCount; i++)
   {
     LalrItem* existing = findItem(state, &currentProd->options[i], 0, nullptr, lookaheadCount);
+    
     if(!existing)
-      existing = LalrState_createItem(state, &currentProd->options[i], 0, lookahead, lookaheadCount);
-    if(!isTokenListEqual(lookahead, lookaheadCount, existing->lookahead, existing->lookaheadCount));
+      LalrState_createItem(state, &currentProd->options[i], 0, lookahead, lookaheadCount);
+    else
+    {
+      int oldCount = existing->lookaheadCount;
       for(int l = 0; l < lookaheadCount; l++)
         existing->lookaheadCount = maybeAddToken(existing->lookahead, existing->lookaheadCount, lookahead[l]);
+      changedLookahead = changedLookahead || (oldCount != existing->lookaheadCount);
+    }
   }
+
+  return changedLookahead;
 }
 
-static void expandStateItems(LalrState* state)
+static bool expandStateItems(LalrState* state)
 {
+  bool changedLookahead = false;
   for(int i = 0; i < state->itemCount; i++)
-    expandItem(state, &state->items[i]);
+  {
+    if(expandItem(state, &state->items[i]))
+    {
+      changedLookahead = true;
+      i = 0;
+    }
+  }
+  return changedLookahead;
 }
 
 static LalrState* findState(LalrMachine* stateMachine, LalrItem** baseItems, int baseItemCount)
@@ -183,7 +199,7 @@ static LalrState* findState(LalrMachine* stateMachine, LalrItem** baseItems, int
 
       bool allPresent = true;
       for(int j = 0; j < state.itemCount; j++)
-        if(!findItem(candidates[i], items[j].production, items[j].position, items[j].lookahead, items[j].lookaheadCount))
+        if(!findItem(candidates[i], items[j].production, items[j].position, nullptr, items[j].lookaheadCount))
           allPresent = false;
 
       if(allPresent)
@@ -211,10 +227,32 @@ static void addTransition(LalrState* from, LalrState* to, TokenExpr* expectedTok
     from->transitions = transitions;
   }
 
-  LalrTransition* transition = &from->transitions[from->transitionCount++];
+  LalrTransition* transition = nullptr;
+  for(int i = 0; i < from->transitionCount; i++)
+    if(from->transitions[i].target == to) transition = &from->transitions[i];
+  
+  if(!transition) transition = &from->transitions[from->transitionCount++];
   transition->target = to;
   transition->token = expectedToken;
   transition->production = expectedProd;
+}
+
+static bool mergeStateItems(LalrState* target, LalrItem** baseItems, int baseItemCount)
+{
+  bool changedLookahead = false;
+  for(int i = 0; i < baseItemCount; i++)
+  {
+    LalrItem* item = findItem(target, baseItems[i]->production, baseItems[i]->position, nullptr, baseItems[i]->lookaheadCount);
+    int oldCount = item->lookaheadCount;
+    for(int j = 0; j < baseItems[i]->lookaheadCount; j++)
+      item->lookaheadCount = maybeAddToken(item->lookahead, item->lookaheadCount, baseItems[i]->lookahead[j]);
+    changedLookahead = changedLookahead || (oldCount != item->lookaheadCount);
+  }
+
+  if(changedLookahead)
+    expandStateItems(target);
+
+  return changedLookahead;
 }
 
 static void createTransitions(LalrMachine* stateMachine, LalrState* state)
@@ -256,6 +294,11 @@ static void createTransitions(LalrMachine* stateMachine, LalrState* state)
 
     LalrState* target = findState(stateMachine, baseItems, baseItemCount);
     if(!target) target = LalrMachine_createState(stateMachine, baseItems, baseItemCount);
+    else if(mergeStateItems(target, baseItems, baseItemCount))
+    {
+      createTransitions(stateMachine, target);
+    }
+
     addTransition(state, target, expectedToken, expectedProd);
   }
 
@@ -337,6 +380,61 @@ LalrItem* LalrState_createItem(LalrState* state, ProductionOption* production, i
   memcpy(item->lookahead, lookahead, sizeof(TokenExpr*)*lookaheadCount);
 
   return item;
+}
+
+LalrStep LalrMachine_step(LalrMachine* lalrMachine, LalrStep step, TokenExpr* input)
+{
+  if(step.stackSize == 0)
+  {
+    memset(&step, 0, sizeof(step));
+    step.stackSize = 1;
+    step.stateStack[0] = lalrMachine->start;
+  }
+
+  step.result = LALR_STEP_CONTINUE;
+  step.reduceCount = 0;
+  if(input->ignored) return step;
+
+  LalrState* state = step.stateStack[step.stackSize-1];
+
+  for(int i = 0; i < state->transitionCount; i++)
+    if(state->transitions[i].token == input)
+    {
+      step.stateStack[step.stackSize++] = state->transitions[i].target;
+      return step;
+    }
+
+  for(int i = 0; i < state->itemCount; i++)
+    if(state->items[i].position >= state->items[i].production->stepCount)
+      for(int j = 0; j < state->items[i].lookaheadCount; j++)
+        if(state->items[i].lookahead[j] == input)
+        {
+          step.reduces[step.reduceCount++] = state->items[i].production->base;
+          step.stackSize -= state->items[i].production->stepCount;
+        } 
+  
+  switch(step.reduceCount)
+  {
+    case 0: step.result = LALR_STEP_SYNTAX_ERROR; break;
+    case 1:
+    {
+      state = step.stateStack[step.stackSize-1];
+      for(int i = 0; i < state->transitionCount; i++)
+        if(state->transitions[i].production == step.reduces[0])
+        {
+          step.stateStack[step.stackSize++] = state->transitions[i].target;
+          step.result = LALR_STEP_REDUCE;
+          return step;
+        }
+
+      step.result = LALR_STEP_SYNTAX_ERROR;
+    }
+    break;
+    default:
+      step.result = LALR_STEP_REDUCE_REDUCE;
+  }
+
+  return step;
 }
 
 void LalrMachine_print(LalrMachine* lalrMachine)

@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include "grammar/grammar.h"
+#include "parsers/lexer.h"
 #include "grammar/lalrMachine.h"
 
 enum ReturnCodes
@@ -26,32 +27,83 @@ int compile(Grammar* grammar, char* fileContent)
 { 
   if(!Grammar_load(grammar, fileContent)) return COMPILE_ERROR;
   
-  LalrMachine lalrMachine = LalrMachine_create(grammar);
-
-  LalrMachine_print(&lalrMachine);
-
-  LalrMachine_clean(&lalrMachine);
-
   return OK;
 }
 
 int mainOld(int numArgs, char** args);
 
-void testToken(Grammar* grammar, char* str)
-{ 
-  int length = strlen(str);
+static void nextToken(Grammar* grammar, char* content, int startIndex, int length, Token* ret)
+{
+  memset(ret, 0, sizeof(Token));
+  ret->type = TOKEN_UNKNOWN;
+  ret->index = startIndex;
+  ret->length = 1;
+
   StateMachineState* states[grammar->tokenCount];
   for(int s = 0; s < grammar->tokenCount; s++)
     states[s] = grammar->tokens[s].stateMachine.start;
 
-  for(int i = 0; i < length; i++)
+  bool any = true;
+  int i = startIndex;
+  while(any && i < length)
+  {
+    any = false;
     for(int s = 0; s < grammar->tokenCount; s++)
       if(states[s] != nullptr)
-        states[s] = StateMachine_step(states[s], str[i]);
-  
-  for(int s = 0; s < grammar->tokenCount; s++)
-    if(states[s] != nullptr && states[s]->accepted)
-      printf("%s\n", grammar->tokens[s].name);
+      {
+        any = true;
+        states[s] = StateMachine_step(states[s], content[i]);
+        if(states[s] != nullptr && states[s]->accepted)
+        {
+          ret->type = s;
+          ret->length = i + 1 - startIndex; 
+        } 
+      }
+
+    if(any) i++;
+  }
+}
+
+int testFile(Grammar* grammar, LalrMachine* lalrMachine, char* filePath)
+{ 
+  char* fileContent = readFile(filePath);
+  if(!filePath) return showError("Could not open test file", PARAM_ERROR);
+  int length = strlen(fileContent);
+  int index = 0;
+
+  LalrStep lalrStep;
+  memset(&lalrStep, 0, sizeof(LalrStep));
+
+  Token token;
+
+  while(index < length)
+  {
+    nextToken(grammar, fileContent, index, length, &token);
+    index += token.length;
+    if(token.type == TOKEN_UNKNOWN)
+      printf("UNKNOWN_TOKEN!\n");
+    else
+      printf("%s\n", grammar->tokens[token.type].name);
+
+    lalrStep = LalrMachine_step(lalrMachine, lalrStep, &grammar->tokens[token.type]);
+    while(lalrStep.result == LALR_STEP_REDUCE)
+    {
+      printf("lalr state: %i\n", lalrStep.stateStack[lalrStep.stackSize-1]->index);
+      lalrStep = LalrMachine_step(lalrMachine, lalrStep, &grammar->tokens[token.type]);
+    }
+
+    printf("lalr state: %i\n", lalrStep.stateStack[lalrStep.stackSize-1]->index);
+
+    if(lalrStep.result != LALR_STEP_CONTINUE)
+    {
+      printf("Syntax test ended with code %i\n", lalrStep.result);
+      break;
+    }
+  }
+
+  delete(fileContent);
+
+  return OK;
 }
 
 int main(int numArgs, char** args)
@@ -65,9 +117,13 @@ int main(int numArgs, char** args)
 
   Grammar grammar = Grammar_create();
   int ret = compile(&grammar, fileContent);
+  LalrMachine lalrMachine = LalrMachine_create(&grammar);
+  
+  LalrMachine_print(&lalrMachine);
 
-  if(ret == OK && strcmp(args[2], "-token") == 0) testToken(&grammar, args[3]);
+  if(ret == OK && strcmp(args[2], "--test") == 0 && numArgs > 3) testFile(&grammar, &lalrMachine, args[3]);
 
+  LalrMachine_clean(&lalrMachine);
   Grammar_clean(&grammar);
   delete(fileContent);
 

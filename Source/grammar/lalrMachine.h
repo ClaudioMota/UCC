@@ -8,6 +8,7 @@ typedef struct LalrItem LalrItem;
 typedef struct LalrTransition LalrTransition;
 typedef struct LalrState LalrState;
 typedef struct LalrMachine LalrMachine;
+typedef struct LalrStep LalrStep;
 
 #define LALR_LOOKAHEAD_EOF nullptr
 
@@ -44,9 +45,26 @@ struct LalrMachine
   ProductionOption bootstrap;
 };
 
+enum LalrStepResult
+{
+  LALR_STEP_CONTINUE,
+  LALR_STEP_REDUCE,
+  LALR_STEP_ACCEPTED,
+  LALR_STEP_REDUCE_REDUCE,
+  LALR_STEP_SYNTAX_ERROR
+};
+
+struct LalrStep
+{
+  int result;
+  int stackSize, reduceCount;
+  LalrState* stateStack[GRAMMAR_ELEMENTS_MAX];
+  ProductionExpr* reduces[GRAMMAR_ELEMENTS_MAX];
+};
+
 LalrMachine LalrMachine_create(Grammar* grammar);
 
-LalrState* LalrMachine_step(LalrState* state, Token* input);
+LalrStep LalrMachine_step(LalrMachine* lalrMachine, LalrStep step, TokenExpr* input);
 
 void LalrMachine_print(LalrMachine* lalrMachine);
 
