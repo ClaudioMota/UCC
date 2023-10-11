@@ -42,6 +42,7 @@ static bool generateLexerFunctionsHeader(char* path, char* namespace)
   generateHeaderGuardsStart(file, headerTitle);
   
   fprintf(file, "extern int (**%s_lexerFunctions)(int* state, int input);\n", namespace);
+  fprintf(file, "extern int %s_lexerFunctionCount;\n\n", namespace);
   fprintf(file, "bool %s_shouldIgnoreToken(Token* token);\n", namespace);
 
   generateHeaderGuardsEnd(file);
@@ -59,7 +60,7 @@ static void generateTokenFunction(FILE* file, TokenExpr* token)
   {
     StateMachineState* state = token->stateMachine.states[i];
     fprintf(file, "    case %i:\n", state->index);
-    fprintf(file,"    switch(input){\n      ");
+    fprintf(file,"    switch(input)\n    {\n      ");
     for(int j = 0; j < state->transitionCount; j++)
     {
       StateMachineTransition* transition = &state->transitions[j];
@@ -73,8 +74,12 @@ static void generateTokenFunction(FILE* file, TokenExpr* token)
   }
 
   fprintf(file,"    default: *state = LEXER_ERROR;\n  }\n");
-  fprintf(file, "  if(*state == LEXER_ERROR) return LEXER_ERROR;\n");
-  fprintf(file, "}\n\n");
+  fprintf(file, "  if(*state == LEXER_ERROR) return LEXER_ERROR;\n  switch(*state)\n  {\n    ");
+  for(int i = 0; i < token->stateMachine.stateCount; i++)
+    if(token->stateMachine.states[i]->accepted)
+      fprintf(file,"case %i: ", i);
+
+  fprintf(file,"return LEXER_ACCEPTED;\n    default: return LEXER_PROCESSING;\n  }\n}\n\n");
 }
 
 static bool generateLexerFunctionsSource(char* path, Grammar* grammar, char* namespace)
@@ -95,7 +100,8 @@ static bool generateLexerFunctionsSource(char* path, Grammar* grammar, char* nam
     fprintf(file, "\n  func_%s", grammar->tokens[i].name);
   }
 
-  fprintf(file, "\n}\n\nint (**%s_lexerFunctions)(int* state, int input) = functions;\n\n", namespace);
+  fprintf(file, "\n};\n\nint (**%s_lexerFunctions)(int* state, int input) = functions;\n", namespace);
+  fprintf(file, "int %s_lexerFunctionCount = %i;\n\n", namespace, grammar->tokenCount);
   fprintf(file, "bool %s_shouldIgnoreToken(Token* token)\n{\n  switch(token->type){\n    ", namespace);
 
   bool hasIgnored = false;

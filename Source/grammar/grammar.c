@@ -1,14 +1,11 @@
 #include "grammar/grammar.h"
 #include "parsers/lexer.h"
+#include "parsers/ucc/lexerFunctions.h"
 #include "parsers/ucc/production.h"
 #include "parsers/ucc/productions.h"
 #include "parsers/ucc/uccParser.h"
 #include "parsers/ucc/conversion.h"
 #include "stdio.h"
-
-int UCC_lexerFunctionsCount = 24;
-extern int (**UCC_lexerFunctions)(int* state, int input);
-bool UCC_shouldIgnore(Token* token);
 
 Grammar Grammar_create()
 {
@@ -37,7 +34,7 @@ static bool processProductions(Grammar* grammar, Production* mainProd)
 bool Grammar_load(Grammar* grammar, char* content)
 {
   bool ret = true;
-  Lexer lexer = Lexer_create(UCC_lexerFunctionsCount, UCC_lexerFunctions, UCC_shouldIgnore);
+  Lexer lexer = Lexer_create(ucc_lexerFunctionCount, ucc_lexerFunctions, ucc_shouldIgnoreToken);
   Lexer_parse(&lexer, content);
 
   AllProductions allProductions = UCC_createProductionContainer();
