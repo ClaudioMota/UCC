@@ -124,7 +124,7 @@ int checkCliCommands(int numArgs, char** args, Grammar* grammar, LalrMachine* la
       LalrMachine_print(lalrMachine);
     }
     if(strlen(args[i]) > 0)
-      if(!generateLexer(grammar, args[i]))
+      if(!generateGrammar(grammar, lalrMachine, args[i]))
         ret = GENERATION_ERROR;
   }
   return ret;

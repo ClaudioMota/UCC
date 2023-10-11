@@ -290,20 +290,24 @@ static bool visitProduction(ucc_Production_identifier_attrib_Expr_semicolon* pro
   return ret;
 }
 
-static bool visitReducer(UCCProduction* production, VisitData* visitData)
+static bool visitReducer(ucc_Reducer_identifier_reduce_Expr_semicolon* production, VisitData* visitData)
 {
   visitData->mode = MODE_REDUCE;
   bool ret = ucc_visit_defaultFunction((Production*)production, visitData);
 
   if(ret)
   {
-    bool array = production->type != ucc_P_Reducer_identifier_reduce_Expr_semicolon;
-    int idetifierIndex = array ? 1 : 0;
-    int exprIndex = array ? 4 : 2;
-    int count = getProductionListSize(production->nodes[exprIndex].production);
+    Token* targetToken = production->T_identifier0.token;
+    int count = getProductionListSize(production->Expr2.production);
+    Production* factors[count];
+    getProductionList(production->Expr2.production, factors);
 
-    //ProductionExpr* decl = Grammar_reduce(visitData->grammar, );
-    //if(!decl) return compilerError("Could not declare token", production->T_identifier0.token);
+    for(int i = 0; i < count; i++)
+    {
+      Token* sourceToken = factors[i]->nodes[0].token;
+      ReducerExpr* decl = Grammar_reduce(visitData->grammar, sourceToken->content, targetToken->content);
+      if(!decl) return compilerError("Could not reduce production", sourceToken);
+    }
   }
 
   return ret;

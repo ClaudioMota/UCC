@@ -88,7 +88,7 @@ ProductionFactor2 = identifier;
 QuestionOperator = question;
 
 Reducers = Reducers Reducer | Reducer;
-Reducer = identifier reduce ReducerExpr semicolon | o_brackets identifier c_brackets reduce ReducerExpr semicolon;
+Reducer = identifier reduce ReducerExpr semicolon;
 ReducerExpr = ReducerFactor0 | ReducerExpr comma ReducerFactor0;
 ReducerFactor0 = identifier;
 
@@ -101,8 +101,3 @@ Reducer:
 Expr <- HelperExpr, HelperFactor0, TokenExpr, TokenFactor0, TokenFactor1, TokenFactor2, ProductionExpr, ProductionFactor0, ProductionFactor1, ProductionFactor2, ReducerExpr, ReducerFactor0;
 Op <- HelperOperator, OrOperator, ModifierOperator, QuestionOperator, CommaOperator;
 Literal <- HLiteral, TLiteral;
-
-[Helper] <- Helpers;
-[Token] <- Tokens;
-[Production] <- Productions;
-[Reducer] <- Reducers;

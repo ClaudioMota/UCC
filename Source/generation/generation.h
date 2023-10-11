@@ -1,6 +1,11 @@
 #ifndef UCC_GENERATION_HEADER
 #define UCC_GENERATION_HEADER 1
 
-bool generateLexer(Grammar* grammar, char* namespace);
+#include <stdbool.h>
+
+typedef struct Grammar Grammar;
+typedef struct LalrMachine LalrMachine;
+
+bool generateGrammar(Grammar* grammar, LalrMachine* lalrMachine, char* namespace);
 
 #endif

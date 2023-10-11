@@ -356,24 +356,25 @@ int getProductionList(Production* production, Production** outList)
 
   for(int i = 0; i < production->nodeCount; i++)
     if(production->nodes[i].production) numProds++;
-  
-  for(int i = 0; i < production->nodeCount; i++)
+
+  if(numProds <= 1)
   {
-    Production* prod = production->nodes[i].production;
-    if(prod)
-    {
-      if(recursion || numProds == 1)
-      {
-        if(outList != nullptr) outList[currentIndex] = prod;
-        currentIndex++;
-      }
-      else
-      {
-        recursion = true;
-        currentIndex = getProductionList(prod, outList);
-      }
-    }
+    if(outList != nullptr) outList[currentIndex] = production;
+    currentIndex++;
   }
+  else
+    for(int i = 0; i < production->nodeCount; i++)
+    {
+      Production* prod = production->nodes[i].production;
+      if(prod)
+        if(prod->type == production->type)
+          currentIndex = getProductionList(prod, outList);
+        else
+        {
+          if(outList != nullptr) outList[currentIndex] = prod;
+          currentIndex++;
+        }
+    }
 
   return currentIndex;
 }

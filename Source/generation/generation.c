@@ -1,9 +1,10 @@
+#include "generation/generation.h"
 #include "basics.h"
 #include "stdio.h"
 #include "grammar/grammar.h"
 
-static char* generationPath = "generated/";
-static char* baseOutputPath = "generated/parsers/";
+static char* generationPath = "output/";
+static char* baseOutputPath = "output/parsers/";
 static char* linkToRepo = "https://github.com/ClaudioMota/UCC";
 
 static void generateHeaderGuardsStart(FILE* file, char* headerTitle)
@@ -29,21 +30,31 @@ static void generatedFileDisclaimer(FILE* file)
   fprintf(file, "// See %s for more in information.\n\n", linkToRepo);
 }
 
-static bool generateLexerFunctionsHeader(char* path, char* namespace)
+static bool generateParserHeader(char* basePath, char* fileName, Grammar* grammar, char* namespace)
 {
-  FILE* file = fopen(path, "wb");
+  char fullPath[STRING_LENGTH*3];
+  strcpy(fullPath, basePath);
+  strcat(fullPath, fileName);
+
+  FILE* file = fopen(fullPath, "wb");
   if(!file) return compilerError("could not open file for generation", nullptr);
 
   char headerTitle[STRING_LENGTH];
   strcpy(headerTitle, namespace);
-  strcat(headerTitle, "_LEXER_FUNCTIONS_HEADER");
+  strcat(headerTitle, "_PARSER_HEADER");
 
   generatedFileDisclaimer(file);
   generateHeaderGuardsStart(file, headerTitle);
   
+  fprintf(file, "enum %s_Tokens\n{\n  %s_T_UNKNOWN = -2,\n  %s_T_END_OF_INPUT = -1", namespace, namespace, namespace);
+  for(int i = 0; i < grammar->tokenCount; i++)
+    fprintf(file, ",\n  %s_T_%s", namespace, grammar->tokens[i].name);
+  fprintf(file, "\n};\n\n");
+
   fprintf(file, "extern int (**%s_lexerFunctions)(int* state, int input);\n", namespace);
   fprintf(file, "extern int %s_lexerFunctionCount;\n\n", namespace);
   fprintf(file, "bool %s_shouldIgnoreToken(Token* token);\n", namespace);
+  fprintf(file, "Parser %s_parse(Token* tokens, int productionStructSize);\n", namespace);
 
   generateHeaderGuardsEnd(file);
 
@@ -82,15 +93,8 @@ static void generateTokenFunction(FILE* file, TokenExpr* token)
   fprintf(file,"return LEXER_ACCEPTED;\n    default: return LEXER_PROCESSING;\n  }\n}\n\n");
 }
 
-static bool generateLexerFunctionsSource(char* path, Grammar* grammar, char* namespace)
+static void generateLexerSource(FILE* file, Grammar* grammar, char* namespace)
 {
-  FILE* file = fopen(path, "wb");
-  if(!file) return compilerError("could not open file for generation", nullptr);
-
-  generatedFileDisclaimer(file);
-
-  fprintf(file, "#include \"parsers/lexer.h\"\n\n");
-  
   for(int i = 0; i < grammar->tokenCount; i++) generateTokenFunction(file, &grammar->tokens[i]);
 
   fprintf(file, "static int (*functions[])(int* state, int input) = {");
@@ -113,33 +117,50 @@ static bool generateLexerFunctionsSource(char* path, Grammar* grammar, char* nam
     }
   if(hasIgnored) fprintf(file, "return true;\n    ");
   fprintf(file, "default: return false;\n  }\n");
-  fprintf(file, "}\n");
+  fprintf(file, "}\n\n");
+}
+
+static void generateSyntaxSource(FILE* file, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+{
+  
+}
+
+static bool generateParserSource(char* basePath, char* fileName, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+{
+  char fullPath[STRING_LENGTH*3];
+  strcpy(fullPath, basePath);
+  strcat(fullPath, fileName);
+
+  FILE* file = fopen(fullPath, "wb");
+  if(!file) return compilerError("could not open file for generation", nullptr);
+
+  generatedFileDisclaimer(file);
+
+  fprintf(file, "#include \"parsers/lexer.h\"\n");
+  fprintf(file, "#include \"parsers/parser.h\"\n");
+  
+  generateLexerSource(file, grammar, namespace);
+  generateSyntaxSource(file, grammar, lalrMachine, namespace);
   
   fclose(file);
 
   return true;
 }
 
-bool generateLexer(Grammar* grammar, char* namespace)
+bool generateGrammar(Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
 {
   char finalBasePath[STRING_LENGTH*3];
-  char lexerFunctionsHeaderPath[STRING_LENGTH*3];
-  char lexerFunctionsSourcePath[STRING_LENGTH*3];
 
   strcpy(finalBasePath, baseOutputPath);
   strcat(finalBasePath, namespace);
+  strcat(finalBasePath, "/");
 
   createDirectory(generationPath);
   createDirectory(baseOutputPath);
   createDirectory(finalBasePath);
 
-  strcpy(lexerFunctionsHeaderPath, finalBasePath);
-  strcat(lexerFunctionsHeaderPath, "/lexerFunctions.h");
+  if(!generateParserHeader(finalBasePath, "parser.h", grammar, namespace)) return false;
+  if(!generateParserSource(finalBasePath, "parser.c", grammar, lalrMachine, namespace)) return false;
 
-  strcpy(lexerFunctionsSourcePath, finalBasePath);
-  strcat(lexerFunctionsSourcePath, "/lexerFunctions.c");
-
-  if(!generateLexerFunctionsHeader(lexerFunctionsHeaderPath, namespace)) return false;
-  if(!generateLexerFunctionsSource(lexerFunctionsSourcePath, grammar, namespace)) return false;
   return true;
 }

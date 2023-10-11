@@ -129,7 +129,19 @@ ProductionExpr* Grammar_addProduction(Grammar* grammar, char* name, int stepCoun
   return prodExpr;
 }
 
-ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to, bool array);
+ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to)
+{
+  ProductionExpr* fromProd = Grammar_getProduction(grammar, from);
+  if(!fromProd) return nullptr;
+  if(Grammar_getReducer(grammar, from)) return nullptr;
+  
+  int index = grammar->reducerCount++;
+  ReducerExpr* reducer = &grammar->reducers[index];
+  strcpy(reducer->to, to);
+  reducer->from = fromProd;
+
+  return reducer;
+}
 
 Helper* Grammar_getHelper(Grammar* grammar, char* name)
 {
@@ -161,7 +173,7 @@ ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name)
 ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
 {
   for(int i = 0; i < grammar->reducerCount; i++)
-    if(strcmp(name, grammar->reducers[i].from) == 0)
+    if(strcmp(name, grammar->reducers[i].from->name) == 0)
       return &grammar->reducers[i];
 
   return nullptr;

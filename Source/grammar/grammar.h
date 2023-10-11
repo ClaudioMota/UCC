@@ -49,9 +49,8 @@ struct ProductionExpr
 
 struct ReducerExpr
 {
-  char from[STRING_LENGTH];
+  ProductionExpr* from;
   char to[STRING_LENGTH];
-  bool isArray;
 };
 
 struct Grammar
@@ -68,7 +67,7 @@ bool Grammar_load(Grammar* grammar, char* content);
 Helper* Grammar_declareHelper(Grammar* grammar, char* name);
 TokenExpr* Grammar_declareToken(Grammar* grammar, char* name, bool ignored);
 ProductionExpr* Grammar_addProduction(Grammar* grammar, char* name, int stepCount, char** steps);
-ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to, bool array);
+ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to);
 Helper* Grammar_getHelper(Grammar* grammar, char* name);
 TokenExpr* Grammar_getToken(Grammar* grammar, char* name);
 ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name);
