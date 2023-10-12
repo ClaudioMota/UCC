@@ -1,6 +1,7 @@
 #ifndef BASICS_HEADER
 #define BASICS_HEADER 1
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,5 +35,11 @@ char* getStringActualContent(char* ret, char* data);
 bool failIfNull(void* pointer, char* errorMessage);
 
 bool createDirectory(char* path);
+
+FILE* createFile(char* basePath, char* name);
+
+FILE* openFile(char* path);
+
+void closeFile(FILE* file);
 
 #endif

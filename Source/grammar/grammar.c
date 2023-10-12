@@ -133,11 +133,11 @@ ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to)
 {
   ProductionExpr* fromProd = Grammar_getProduction(grammar, from);
   if(!fromProd) return nullptr;
-  if(Grammar_getReducer(grammar, from)) return nullptr;
+  if(Grammar_getReduced(grammar, fromProd)) return nullptr;
   
-  int index = grammar->reducerCount++;
-  ReducerExpr* reducer = &grammar->reducers[index];
-  strcpy(reducer->to, to);
+  grammar->reducerCount++;
+  ReducerExpr* reducer = &grammar->reducers[fromProd->index];
+  reducer->to = findOrCreateProduction(grammar, to);
   reducer->from = fromProd;
 
   return reducer;
@@ -170,13 +170,9 @@ ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name)
   return nullptr;
 }
 
-ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name)
+ProductionExpr* Grammar_getReduced(Grammar* grammar, ProductionExpr* production)
 {
-  for(int i = 0; i < grammar->reducerCount; i++)
-    if(strcmp(name, grammar->reducers[i].from->name) == 0)
-      return &grammar->reducers[i];
-
-  return nullptr;
+  return grammar->reducers[production->index].to;
 }
 
 

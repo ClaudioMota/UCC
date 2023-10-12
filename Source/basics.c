@@ -4,28 +4,28 @@
 #include <stdlib.h>
 #include <parsers/lexer.h>
 
-static int allocs = 0;
+static int leaks = 0;
 
 void* new(long long size)
 {
-  allocs++;
+  leaks++;
   return malloc(size);
 }
 
 void delete(void* pointer)
 {
-  allocs--;
+  leaks--;
   free(pointer);
 }
 
 int leakCount()
 {
-  return allocs;
+  return leaks;
 }
 
 char* readFile(char* path)
 {
-  FILE* file = fopen(path, "rb");
+  FILE* file = openFile(path);
   if(!file) return 0;
   fseek(file, 0, SEEK_END);
   long long size = ftell(file);
@@ -33,6 +33,7 @@ char* readFile(char* path)
   char* ret = new(size + 1);
   ret[size] = '\0';
   fread(ret, 1, size, file);
+  closeFile(file);
   return ret;
 }
 
@@ -92,4 +93,28 @@ int mkdir(char*, int);
 bool createDirectory(char* path)
 {
   return mkdir(path, 0777) == 0;
+}
+
+FILE* createFile(char* basePath, char* fileName)
+{
+  char fullPath[STRING_LENGTH*3];
+  strcpy(fullPath, basePath);
+  strcat(fullPath, fileName);
+
+  FILE* file = fopen(fullPath, "wb");
+  if(file) leaks++;
+  return file;
+}
+
+FILE* openFile(char* path)
+{
+  FILE* file = fopen(path, "rb");
+  if(file) leaks++;
+  return file;
+}
+
+void closeFile(FILE* file)
+{
+  fclose(file);
+  leaks--;
 }

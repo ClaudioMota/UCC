@@ -10,7 +10,7 @@ enum ReturnCodes
   PARAM_ERROR,
   COMPILE_ERROR,
   GENERATION_ERROR,
-  MEMORY_LEAK
+  MEMORY_LEAK = 0b10000
 };
 
 int showHelp()
@@ -149,7 +149,7 @@ int main(int numArgs, char** args)
   Grammar_clean(&grammar);
   delete(fileContent);
 
-  if(ret == OK && leakCount()) ret = MEMORY_LEAK;
+  if(leakCount()) ret |= MEMORY_LEAK;
 
   printf("finished with code %i\n", ret);
 

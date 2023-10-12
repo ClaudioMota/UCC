@@ -50,7 +50,7 @@ struct ProductionExpr
 struct ReducerExpr
 {
   ProductionExpr* from;
-  char to[STRING_LENGTH];
+  ProductionExpr* to;
 };
 
 struct Grammar
@@ -71,7 +71,7 @@ ReducerExpr* Grammar_reduce(Grammar* grammar, char* from, char* to);
 Helper* Grammar_getHelper(Grammar* grammar, char* name);
 TokenExpr* Grammar_getToken(Grammar* grammar, char* name);
 ProductionExpr* Grammar_getProduction(Grammar* grammar, char* name);
-ReducerExpr* Grammar_getReducer(Grammar* grammar, char* name);
+ProductionExpr* Grammar_getReduced(Grammar* grammar, ProductionExpr* production);
 void Grammar_clean(Grammar* grammar);
 
 #endif
