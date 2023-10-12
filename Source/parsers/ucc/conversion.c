@@ -240,22 +240,23 @@ static int countProdPossibilities(Production* expr)
   return ret;
 }
 
-static int getProdPossibility(Production* expr, int* index, char** steps, int stepIndex)
+static int getProdPossibility(Production* expr, int index, char** steps, int stepIndex)
 {
-  if(expr->type == ucc_P_Expr_Expr_Op)
+  switch(expr->type)
   {
-    if((*index & 1) == 0) return stepIndex;
-    *index >>= 1;
-  }
-
-  for(int i = 0; i < expr->nodeCount; i++)
-  {
-    if(expr->nodes[i].production)
-      stepIndex = getProdPossibility(expr->nodes[i].production, index, steps, stepIndex);
-    else if(expr->nodes[i].token && expr->type == ucc_P_Expr_identifier)
-    {
-      strcpy(steps[stepIndex++], expr->nodes[i].token->content);
-    }
+    case ucc_P_Expr_Expr_Op:
+      if(index & 1)
+        stepIndex = getProdPossibility(expr->nodes[0].production, index, steps, stepIndex);
+    break;
+    case ucc_P_Expr_identifier:
+      strcpy(steps[stepIndex++], expr->nodes[0].token->content);
+    break;
+    case ucc_P_Expr_Expr_Expr:
+      int nextIndex = index;
+      if(expr->nodes[1].production->type == ucc_P_Expr_Expr_Op) nextIndex >>= 1;
+      stepIndex = getProdPossibility(expr->nodes[0].production, nextIndex, steps, stepIndex);
+      stepIndex = getProdPossibility(expr->nodes[1].production, index, steps, stepIndex);
+    break;
   }
 
   return stepIndex;
@@ -278,8 +279,7 @@ static bool visitProduction(ucc_Production_identifier_attrib_Expr_semicolon* pro
         char stepsNames[MAX_PRODUCTION_LENGTH][STRING_LENGTH];
         char* steps[MAX_PRODUCTION_LENGTH];
         for(int s = 0; s < MAX_PRODUCTION_LENGTH; s++) steps[s] = stepsNames[s];
-        int index = p;
-        int stepCount = getProdPossibility(prods[i], &index, steps, 0);
+        int stepCount = getProdPossibility(prods[i], p, steps, 0);
         
         ProductionExpr* decl = Grammar_addProduction(visitData->grammar, production->T_identifier0.token->content, stepCount, steps);
         if(!decl) return compilerError("Could not declare production", production->T_identifier0.token);
