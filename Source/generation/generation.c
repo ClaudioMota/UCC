@@ -159,7 +159,13 @@ static int maybeMapFullName(char* fullName, char** mappedFullNames, int* mapSize
   return (*mapSize)++;
 }
 
-static int createProductionFullNameMaps(Grammar* grammar, char*** fullNamesP, int** prodToFullNameP, int** mapOptionToFullNameP)
+static int createProductionFullNameMaps(
+    Grammar* grammar,
+    char*** fullNamesP,
+    int** prodToFullNameP,
+    int** mapOptionToFullNameP,
+    ProductionOption*** mapFullNameToOptionP
+  )
 {
   int optionIndex = 0, mapSize = 0;
   int maxFullNames = grammar->productionCount;
@@ -169,9 +175,11 @@ static int createProductionFullNameMaps(Grammar* grammar, char*** fullNamesP, in
   char** mappedFullNames = new(sizeof(char*)*maxFullNames);
   int* prodToFullName = new(sizeof(int)*grammar->productionCount);
   int* mapOptionToFullName = new(sizeof(char*)*maxFullNames);
+  ProductionOption** mapFullNameToOption = new(sizeof(ProductionOption*)*maxFullNames);
   memset(mappedFullNames, 0, sizeof(char*)*maxFullNames);
   memset(prodToFullName, 0, sizeof(int)*grammar->productionCount);
   memset(mapOptionToFullName, 0, sizeof(int)*maxFullNames);
+  memset(mapFullNameToOption, 0, sizeof(ProductionOption*)*maxFullNames);
 
   for(int i = 0; i < grammar->productionCount; i++)
   {
@@ -188,13 +196,16 @@ static int createProductionFullNameMaps(Grammar* grammar, char*** fullNamesP, in
       char fullName[length + 1];
       fullName[0] = '\0';
       getProductionFullName(option, grammar, fullName);
-      mapOptionToFullName[optionIndex++] = maybeMapFullName(fullName, mappedFullNames, &mapSize);
+      int nameIndex = maybeMapFullName(fullName, mappedFullNames, &mapSize);
+      mapOptionToFullName[optionIndex++] = nameIndex;
+      mapFullNameToOption[nameIndex] = option;
     }
   }
 
   *fullNamesP = mappedFullNames;
   *prodToFullNameP = prodToFullName;
   *mapOptionToFullNameP = mapOptionToFullName;
+  *mapFullNameToOptionP = mapFullNameToOption;
   return mapSize;
 }
 
@@ -206,9 +217,14 @@ static void generateProductionsHeader(FILE* file, Grammar* grammar, LalrMachine*
   generatedFileDisclaimer(file);
   generateHeaderGuardsStart(file, headerTitle);
 
+  fprintf(file, "#include <stdbool.h>\n");
+  fprintf(file, "#include <parsers/parser.h>\n\n");
+
   char** fullNames;
   int* mapOptionToFullName, *mapProdToFullName;
-  int fullNameCount = createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName);
+  ProductionOption** mapFullNameToOption;
+  int fullNameCount =
+    createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName, &mapFullNameToOption);
 
   // Visit functions
   char* visitType = "extern VisitFunction ";
@@ -219,43 +235,36 @@ static void generateProductionsHeader(FILE* file, Grammar* grammar, LalrMachine*
   // Productions enum
   fprintf(file, "\nenum %s_ProductionType\n{\n  %s_P_UNKNOWN", namespace, namespace);
   for(int i = 0; i < fullNameCount; i++)
-  {
-    bool isBaseProdName = false;
-    for(int j = 0; j < grammar->productionCount; j++)
-      if(mapProdToFullName[j] == i) isBaseProdName = true;
-    if(!isBaseProdName) fprintf(file, ",\n  %s_P_%s", namespace, fullNames[i]);
-  }
-  fprintf(file, "\n}\n");
+    if(mapFullNameToOption[i] != nullptr) fprintf(file, ",\n  %s_P_%s", namespace, fullNames[i]);
+  fprintf(file, "\n};\n");
 
   // Productions structs
-  int optionIndex = 0;
-  for(int i = 0; i < grammar->productionCount; i++)
-    for(int j = 0; j < grammar->productions[i].optionCount; j++)
+  for(int i = 0; i < fullNameCount; i++)
+  {
+    ProductionOption* prod = mapFullNameToOption[i];
+    if(!prod) continue;
+    fprintf(file, "\ntypedef struct \n{\n  int type;\n  int nodeCount;\n");
+    for(int k = 0; k < prod->stepCount; k++)
     {
-      ProductionOption* prod = &grammar->productions[i].options[j];
-      char* fullName = fullNames[mapOptionToFullName[optionIndex]];
-      fprintf(file, "\ntypedef struct \n{\n  int type;\n  int nodeCount;\n");
-      for(int k = 0; k < prod->stepCount; k++)
+      char* stepName;
+      if(prod->steps[k].token) stepName = prod->steps[k].token->name;
+      else
       {
-        char* stepName;
-        if(prod->steps[k].token) stepName = prod->steps[k].token->name;
-        else
-        {
-          ProductionExpr* prodExpr = Grammar_getReduced(grammar, prod->steps[k].production);
-          if(!prodExpr) prodExpr = prod->steps[k].production;
-          stepName = prodExpr->name;
-        }
-        fprintf(file, "  ProductionNode %s%i\n", stepName, k);
+        ProductionExpr* prodExpr = Grammar_getReduced(grammar, prod->steps[k].production);
+        if(!prodExpr) prodExpr = prod->steps[k].production;
+        stepName = prodExpr->name;
       }
-      fprintf(file, "} %s_%s;\n", namespace, fullName);
-      optionIndex++;
+      fprintf(file, "  ProductionNode %s%i;\n", stepName, k);
     }
+    fprintf(file, "} %s_%s;\n", namespace, fullNames[i]);
+  }
 
   generateHeaderGuardsEnd(file);
 
   for(int i = 0; i < fullNameCount; i++)
     if(fullNames[i]) delete(fullNames[i]);
   delete(mapProdToFullName);
+  delete(mapFullNameToOption);
   delete(mapOptionToFullName);
   delete(fullNames);
 }
@@ -264,7 +273,8 @@ static void generateProductionsSource(FILE* file, Grammar* grammar, LalrMachine*
 {
   char** fullNames;
   int* mapOptionToFullName, *mapProdToFullName;
-  int fullNameCount = createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName);
+  ProductionOption** mapFullNameToOption;
+  int fullNameCount = createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName, &mapFullNameToOption);
   bool* shouldReduce = new(sizeof(bool)*fullNameCount);
 
   // Visit functions
@@ -297,37 +307,26 @@ static void generateProductionsSource(FILE* file, Grammar* grammar, LalrMachine*
   
   fprintf(file, "\nbool %s_nodeRedundancyTable[] = {\n  false, // UNKNOWN\n", namespace);
   for(int i = 0; i < fullNameCount; i++)
-  {
-    bool isBaseProdName = false;
-    for(int j = 0; j < grammar->productionCount; j++)
-      if(mapProdToFullName[j] == i) isBaseProdName = true;
-    if(!isBaseProdName)
+    if(mapFullNameToOption[i] != nullptr)
       fprintf(file, "  %s%s //%s\n", shouldReduce[i] ? "true" : "false", i < fullNameCount -1 ? "," : "", fullNames[i]);
-  }
-  fprintf(file, "}\n");
+  fprintf(file, "};\n");
 
   // visit function
   fprintf(file, "\nbool %s_visit(Production* production, VisitData* visitData)\n{\n", namespace);
   fprintf(file, "  %s visitFunction = nullptr;\n  switch(production->type)\n  {\n", visitType);
   for(int i = 0; i < fullNameCount; i++)
-  {
-    bool isBaseProdName = false;
-    for(int j = 0; j < grammar->productionCount; j++)
-      if(mapProdToFullName[j] == i) isBaseProdName = true;
-    if(!isBaseProdName)
+    if(mapFullNameToOption[i] != nullptr)
       fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, fullNames[i], namespace, fullNames[i]);
-  }
+
   fprintf(file, "  }\n  if(visitFunction != nullptr) return visitFunction(production, visitData);\n\n");
+  
   fprintf(file, "  switch(production->type)\n  {\n");
-  char* lastBaseProdFullName = nullptr;
   for(int i = 0; i < fullNameCount; i++)
-  {
-    bool isBaseProdName = false;
-    for(int j = 0; j < grammar->productionCount; j++)
-      if(mapProdToFullName[j] == i) isBaseProdName = true;
-    if(isBaseProdName) lastBaseProdFullName = fullNames[i];
-    else fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, fullNames[i], namespace, lastBaseProdFullName);
-  }
+    if(mapFullNameToOption[i] != nullptr)
+    {
+      char* parentProdFullName = fullNames[mapProdToFullName[mapFullNameToOption[i]->base->index]];
+      fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, fullNames[i], namespace, parentProdFullName);
+    }
   fprintf(file, "  }\n  if(visitFunction != nullptr) return visitFunction(production, visitData);\n\n");
   fprintf(file, "  return %s_visit_defaultFunction(production, visitData);\n}\n\n", namespace);
 
@@ -335,6 +334,7 @@ static void generateProductionsSource(FILE* file, Grammar* grammar, LalrMachine*
     if(fullNames[i]) delete(fullNames[i]);
   delete(mapProdToFullName);
   delete(mapOptionToFullName);
+  delete(mapFullNameToOption);
   delete(shouldReduce);
   delete(fullNames);
 }

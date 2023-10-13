@@ -25,8 +25,8 @@ static bool visitHelper(ucc_Helper_identifier_attrib_Expr_semicolon* production,
  
   if(ret)
   {
-    Helper* decl = Grammar_declareHelper(visitData->grammar, production->T_identifier0.token->content);
-    if(!decl) return compilerError("Could not declare helper", production->T_identifier0.token);
+    Helper* decl = Grammar_declareHelper(visitData->grammar, production->identifier0.token->content);
+    if(!decl) return compilerError("Could not declare helper", production->identifier0.token);
     memcpy(decl->values, ((UCCProduction*)production->Expr2.production)->helperValue, SUPPORTED_CHARACTERS);
   }
 
@@ -281,8 +281,8 @@ static bool visitProduction(ucc_Production_identifier_attrib_Expr_semicolon* pro
         for(int s = 0; s < MAX_PRODUCTION_LENGTH; s++) steps[s] = stepsNames[s];
         int stepCount = getProdPossibility(prods[i], p, steps, 0);
         
-        ProductionExpr* decl = Grammar_addProduction(visitData->grammar, production->T_identifier0.token->content, stepCount, steps);
-        if(!decl) return compilerError("Could not declare production", production->T_identifier0.token);
+        ProductionExpr* decl = Grammar_addProduction(visitData->grammar, production->identifier0.token->content, stepCount, steps);
+        if(!decl) return compilerError("Could not declare production", production->identifier0.token);
       }
     }
   }
@@ -297,7 +297,7 @@ static bool visitReducer(ucc_Reducer_identifier_reduce_Expr_semicolon* productio
 
   if(ret)
   {
-    Token* targetToken = production->T_identifier0.token;
+    Token* targetToken = production->identifier0.token;
     int count = getProductionListSize(production->Expr2.production);
     Production* factors[count];
     getProductionList(production->Expr2.production, factors);

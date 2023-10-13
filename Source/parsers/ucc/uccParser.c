@@ -498,9 +498,9 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createShift(T_semicolon,23)
 	};
 	Action state23Actions[] = {
-		createReduce1(T_identifier, 4, ucc_P_Reducer_o_brackets_identifier_c_brackets_reduce_Expr_semicolon, 6),
-		createReduce1(T_o_brackets, 4, ucc_P_Reducer_o_brackets_identifier_c_brackets_reduce_Expr_semicolon, 6),
-		createReduce1(END_OF_INPUT, 4, ucc_P_Reducer_o_brackets_identifier_c_brackets_reduce_Expr_semicolon, 6)
+		createReduce1(T_identifier, 4, 1, 6),
+		createReduce1(T_o_brackets, 4, 1, 6),
+		createReduce1(END_OF_INPUT, 4, 1, 6)
 	};
 	Action state24Actions[] = {
 		createReduce1(T_identifier, 5, ucc_P_Reducers_Reducer, 1),
