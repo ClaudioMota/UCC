@@ -1,7 +1,6 @@
 #include "grammar/grammar.h"
 #include "parsers/lexer.h"
-#include "parsers/ucc/lexerFunctions.h"
-#include "parsers/ucc/production.h"
+#include "parsers/parser.h"
 #include "parsers/ucc/productions.h"
 #include "parsers/ucc/uccParser.h"
 #include "parsers/ucc/conversion.h"
@@ -37,9 +36,8 @@ bool Grammar_load(Grammar* grammar, char* content)
   Lexer lexer = Lexer_create(ucc_lexerFunctionCount, ucc_lexerFunctions, ucc_shouldIgnoreToken);
   Lexer_parse(&lexer, content);
 
-  AllProductions allProductions = UCC_createProductionContainer();
-
-  Parser parser = ucc_parse(&allProductions, UCC_createProduction, lexer.tokens);
+  ProductionContainer allProductions = createProductionContainer(sizeof(UCCProduction));
+  Parser parser = ucc_parse(&allProductions, lexer.tokens);
 
   if(!parser.hasError)
   {
@@ -52,7 +50,7 @@ bool Grammar_load(Grammar* grammar, char* content)
     ret = compilerError("Syntax error", parser.token);
   }
 
-  UCC_freeProductionContainer(&allProductions);
+  cleanProductionContainer(&allProductions);
 
   freeParser(&parser);
   Lexer_clean(&lexer);

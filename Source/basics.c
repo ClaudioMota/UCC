@@ -113,6 +113,24 @@ FILE* openFile(char* path)
   return file;
 }
 
+bool copyFile(char *from, char* toBasePath, char* to)
+{
+  char* content = readFile(from);
+  if(content == nullptr) return false;
+  bool ret = false;
+  FILE* dest = createFile(toBasePath, to);
+  if(dest != nullptr)
+  {
+    long long length = strlen(content);
+    ret = length == fwrite(content, sizeof(char), length, dest);
+    closeFile(dest);
+  }
+
+  delete(content);
+
+  return ret;
+}
+
 void closeFile(FILE* file)
 {
   fclose(file);

@@ -41,7 +41,35 @@ Token* newToken()
   return token;
 }
 
-static Parser* createParser(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), AllParsers* allParsers)
+ProductionContainer createProductionContainer(int productionStructSize)
+{
+  ProductionContainer ret;
+  ret.containerCount = 0;
+  ret.currentContainerIndex = CONTAINER_MAX_PRODUCTIONS;
+  ret.productionStructSize = productionStructSize;
+  return ret;
+}
+
+static Production* createProduction(ProductionContainer* productionContainer)
+{
+  if(productionContainer->currentContainerIndex >= CONTAINER_MAX_PRODUCTIONS)
+  {
+    productionContainer->containers[productionContainer->containerCount++] = new(productionContainer->productionStructSize * CONTAINER_MAX_PRODUCTIONS);
+    productionContainer->currentContainerIndex = 0;
+  }
+  char* productions = productionContainer->containers[productionContainer->containerCount-1];
+  Production* ret = (Production*)&productions[productionContainer->currentContainerIndex*productionContainer->productionStructSize];
+  productionContainer->currentContainerIndex++;
+  return ret;
+}
+
+void cleanProductionContainer(ProductionContainer* productionContainer)
+{ 
+  for(int i = 0; i < productionContainer->containerCount; i++)
+    delete(productionContainer->containers[i]);
+}
+
+static Parser* createParser(ProductionContainer* productionContainer, AllParsers* allParsers)
 {
   allParsers->parserCount = 0;
   allParsers->parsers = new(MAX_PARSERS_OPTIONS*sizeof(Parser));
@@ -60,8 +88,7 @@ static Parser* createParser(AllProductions* allProductions, Production* (*creati
   ret->hasError = false;
 
   ret->allParsers = allParsers;
-  ret->productionCreator = creationFunction;
-  ret->allProductions = allProductions;
+  ret->productionContainer = productionContainer;
 
   return ret;
 }
@@ -85,8 +112,7 @@ static Parser* createParserOption(Parser* old)
   newParser->stateStack = new((newParser->stackSize+1) * sizeof(int));
   newParser->nodesStack = new((newParser->stackSize+1) * sizeof(ProductionNode));
   newParser->allParsers = old->allParsers;
-  newParser->productionCreator = old->productionCreator;
-  newParser->allProductions = old->allProductions;
+  newParser->productionContainer = old->productionContainer;
 
   for(int i = 0; i <= newParser->pos + 1; i++)
   {
@@ -218,7 +244,7 @@ static ProductionNode createProductionNode(Production* production)
 
 static void reduce(int (*goToTable)(int, int), Parser* parser, Action* action, int index)
 {
-  Production* reduction = parser->productionCreator(parser->allProductions);
+  Production* reduction = createProduction(parser->productionContainer);
   reduction->type = action->productionTypes[index];
   int nodeCount = action->productionNodeCount[index];
   reduction->nodeCount = nodeCount;
@@ -425,10 +451,10 @@ static void freeOtherParsers(Parser* parser)
   delete(all->parsers);
 }
 
-Parser parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), State* states, int (*goToTable)(int, int), Token* token)
+Parser parse(ProductionContainer* productionContainer, State* states, int (*goToTable)(int, int), Token* token)
 {
   AllParsers allParsers;
-  Parser* parser = createParser(allProductions, creationFunction, &allParsers);
+  Parser* parser = createParser(productionContainer, &allParsers);
   while(parser->pos >= 0)
   {
     if(token == nullptr || isRelevantToken(token))

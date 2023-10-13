@@ -40,6 +40,8 @@ FILE* createFile(char* basePath, char* name);
 
 FILE* openFile(char* path);
 
+bool copyFile(char *from, char* toBasePath, char* to);
+
 void closeFile(FILE* file);
 
 #endif

@@ -62,7 +62,7 @@ static bool generateParserHeader(FILE* file, Grammar* grammar, char* namespace)
   fprintf(file, "bool %s_visit(Production* production, VisitData* visitData);\n", namespace);
   fprintf(file, "bool %s_visitNodes(Production* production, VisitData* visitData);\n", namespace);
   fprintf(file, "extern bool %s_nodeRedundancyTable[];\n\n", namespace);
-  fprintf(file, "Parser %s_parse(Token* tokens, int productionStructSize);\n", namespace);
+  fprintf(file, "Parser %s_parse(Token* tokens, ProductionContainer* productionContainer, int productionStructSize);\n", namespace);
 
   generateHeaderGuardsEnd(file);
 
@@ -319,7 +319,7 @@ static void generateProductionsSource(FILE* file, FullNameMaps* maps, Grammar* g
     if(maps->fullNameToOption[i] != nullptr)
     {
       char* parentProdFullName = maps->fullNames[maps->prodToFullName[maps->fullNameToOption[i]->base->index]];
-      fprintf(file, "    case %s_P_%s: visifction = %s_visit_%s; break;\n", namespace, maps->fullNames[i], namespace, parentProdFullName);
+      fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, maps->fullNames[i], namespace, parentProdFullName);
     }
   fprintf(file, "  }\n  if(visitFunction != nullptr) return visitFunction(production, visitData);\n\n");
   fprintf(file, "  return %s_visit_defaultFunction(production, visitData);\n}\n\n", namespace);
@@ -345,7 +345,7 @@ static int reducesWithLookahead(LalrState* state, TokenExpr* token, LalrItem** o
 
 static void generateGrammarParser(FILE* file, FullNameMaps* maps, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
 {
-  fprintf(file, "Parser %s_parse(Token* tokens, int productionStructSize)\n{\n", namespace);
+  fprintf(file, "Parser %s_parse(Token* tokens, ProductionContainer* productionContainer, int productionStructSize)\n{\n", namespace);
 
   for(int i = 0; i < lalrMachine->stateCount; i++)
   {
@@ -370,7 +370,7 @@ static void generateGrammarParser(FILE* file, FullNameMaps* maps, Grammar* gramm
       if(reductionCount > 0)
       {
         if(actionCount++ != 0) fprintf(file, ",\n");
-        char* tokenName = token != nullptr ? token->name : "END_OF_FILE";
+        char* tokenName = token != nullptr ? token->name : "END_OF_INPUT";
         fprintf(file, "    createReduce%i(%s_T_%s", reductionCount, namespace, tokenName);
         for(int k = 0; k < reductionCount; k++)
         {
@@ -393,8 +393,9 @@ static void generateGrammarParser(FILE* file, FullNameMaps* maps, Grammar* gramm
     if(i != 0) fprintf(file, ",\n");
     fprintf(file, "    createState(state%iActions, sizeof(state%iActions)/sizeof(Action))", i, i);
   }
-
-  fprintf(file, "\n  };\n  return parse(states, goToTable, token, productionStructSize);\n}\n");
+  
+  fprintf(file, "\n  };\n  *productionContainer = createProductionContainer(productionStructSize);\n");
+  fprintf(file, "  return parse(productionContainer, states, goToTable, tokens);\n}\n");
 }
 
 static void generateGotoTable(FILE* file, LalrMachine* lalrMachine)
@@ -426,7 +427,8 @@ static void generateParserSource(FILE* file, FullNameMaps* maps, Grammar* gramma
 
   fprintf(file, "#include \"parsers/lexer.h\"\n");
   fprintf(file, "#include \"parsers/parser.h\"\n");
-  fprintf(file, "#include \"%s/parsers/productions.h\"\n", namespace);
+  fprintf(file, "#include \"parsers/%s/parser.h\"\n", namespace);
+  fprintf(file, "#include \"parsers/%s/productions.h\"\n", namespace);
   
   generateLexerSource(file, grammar, namespace);
   generateProductionsSource(file, maps, grammar, lalrMachine, namespace);

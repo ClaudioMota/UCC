@@ -9,6 +9,8 @@ extern "C" {
 #endif
 #endif
 
+#define CONTAINER_MAX_PRODUCTIONS 1024
+
 typedef struct VisitData VisitData;
 typedef struct Production Production;
 typedef struct ProductionNode ProductionNode;
@@ -17,7 +19,7 @@ typedef struct State State;
 typedef struct Token Token;
 typedef struct Action Action;
 typedef struct AllParsers AllParsers;
-typedef struct AllProductions AllProductions;
+typedef struct ProductionContainer ProductionContainer;
 typedef bool (*VisitFunction)(Production*, VisitData*);
 
 struct Action
@@ -62,12 +64,22 @@ struct Parser
   Token* token;
   bool hasError;
 
-  Production* (*productionCreator)(AllProductions* allProductions);
-
   Parser* nextOption;
   AllParsers* allParsers;
-  AllProductions* allProductions;
+  ProductionContainer* productionContainer;
 };
+
+struct ProductionContainer
+{
+  void* containers[CONTAINER_MAX_PRODUCTIONS];
+  int containerCount;
+  int currentContainerIndex;
+  int productionStructSize;
+};
+
+ProductionContainer createProductionContainer(int productionStructSize);
+
+void cleanProductionContainer(ProductionContainer* allProductions);
 
 Token* newToken();
 
@@ -89,7 +101,7 @@ Action createAcceptAction();
 
 State createState(Action* actions, int actionCount);
 
-Parser parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), State* states, int (*goToTable)(int, int), Token* token);
+Parser parse(ProductionContainer* productionContainer, State* states, int (*goToTable)(int, int), Token* token);
 
 Production* getMainProduction(Parser* parser);
 

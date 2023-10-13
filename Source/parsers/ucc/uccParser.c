@@ -406,7 +406,7 @@ static int goToTable(int state, int productionIndex)
 	return 0;
 }
 
-Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)(AllProductions*), Token* token)
+Parser ucc_parse(ProductionContainer* productionContainer, Token* token)
 {
 	Action state0Actions[] = {
 		createShift(ucc_T_helpers,2)
@@ -1112,5 +1112,5 @@ Parser ucc_parse(AllProductions* allProductions, Production* (*creationFunction)
 		createState(state109Actions, sizeof(state109Actions)/sizeof(Action)),
 		createState(state110Actions, sizeof(state110Actions)/sizeof(Action))
 	};
-	return parse(allProductions, creationFunction, states, goToTable, token);
+	return parse(productionContainer, states, goToTable, token);
 }
