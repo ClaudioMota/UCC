@@ -2,10 +2,19 @@
 #include "basics.h"
 #include "stdio.h"
 #include "grammar/grammar.h"
+#include "grammar/lalrMachine.h"
 
 static char* generationPath = "output/";
 static char* baseOutputPath = "output/parsers/";
 static char* linkToRepo = "https://github.com/ClaudioMota/UCC";
+
+typedef struct
+{
+  char** fullNames;
+  int* prodToFullName;
+  ProductionOption** fullNameToOption;
+  int fullNameCount;
+} FullNameMaps;
 
 static void generateHeaderGuardsStart(FILE* file, char* headerTitle)
 {
@@ -159,14 +168,11 @@ static int maybeMapFullName(char* fullName, char** mappedFullNames, int* mapSize
   return (*mapSize)++;
 }
 
-static int createProductionFullNameMaps(
-    Grammar* grammar,
-    char*** fullNamesP,
-    int** prodToFullNameP,
-    int** mapOptionToFullNameP,
-    ProductionOption*** mapFullNameToOptionP
-  )
+static FullNameMaps createProductionFullNameMaps(Grammar* grammar)
 {
+  FullNameMaps ret;
+  memset(&ret, 0, sizeof(ret));
+
   int optionIndex = 0, mapSize = 0;
   int maxFullNames = grammar->productionCount;
   for(int i = 0; i < grammar->productionCount; i++)
@@ -202,14 +208,26 @@ static int createProductionFullNameMaps(
     }
   }
 
-  *fullNamesP = mappedFullNames;
-  *prodToFullNameP = prodToFullName;
-  *mapOptionToFullNameP = mapOptionToFullName;
-  *mapFullNameToOptionP = mapFullNameToOption;
-  return mapSize;
+  ret.fullNames = mappedFullNames;
+  ret.prodToFullName = prodToFullName;
+  ret.fullNameToOption = mapFullNameToOption;
+  ret.fullNameCount = mapSize;
+  delete(mapOptionToFullName);
+  
+  return ret;
 }
 
-static void generateProductionsHeader(FILE* file, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+static void clearFullNameMaps(FullNameMaps* fullNameMaps)
+{
+  for(int i = 0; i < fullNameMaps->fullNameCount; i++)
+    if(fullNameMaps->fullNames[i]) delete(fullNameMaps->fullNames[i]);
+  delete(fullNameMaps->prodToFullName);
+  delete(fullNameMaps->fullNameToOption);
+  delete(fullNameMaps->fullNames);
+  memset(fullNameMaps, 0, sizeof(FullNameMaps));
+}
+
+static void generateProductionsHeader(FILE* file, FullNameMaps* maps, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
 {
   char headerTitle[STRING_LENGTH*2];
   strcpy(headerTitle, namespace);
@@ -220,28 +238,22 @@ static void generateProductionsHeader(FILE* file, Grammar* grammar, LalrMachine*
   fprintf(file, "#include <stdbool.h>\n");
   fprintf(file, "#include <parsers/parser.h>\n\n");
 
-  char** fullNames;
-  int* mapOptionToFullName, *mapProdToFullName;
-  ProductionOption** mapFullNameToOption;
-  int fullNameCount =
-    createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName, &mapFullNameToOption);
-
   // Visit functions
   char* visitType = "extern VisitFunction ";
   fprintf(file, "%s%s_visit_defaultFunction;\n\n", visitType, namespace);
-  for(int i = 0; i < fullNameCount; i++)
-    fprintf(file, "%s%s_visit_%s;\n", visitType, namespace, fullNames[i]);
+  for(int i = 0; i < maps->fullNameCount; i++)
+    fprintf(file, "%s%s_visit_%s;\n", visitType, namespace, maps->fullNames[i]);
 
   // Productions enum
   fprintf(file, "\nenum %s_ProductionType\n{\n  %s_P_UNKNOWN", namespace, namespace);
-  for(int i = 0; i < fullNameCount; i++)
-    if(mapFullNameToOption[i] != nullptr) fprintf(file, ",\n  %s_P_%s", namespace, fullNames[i]);
+  for(int i = 0; i < maps->fullNameCount; i++)
+    if(maps->fullNameToOption[i] != nullptr) fprintf(file, ",\n  %s_P_%s", namespace, maps->fullNames[i]);
   fprintf(file, "\n};\n");
 
   // Productions structs
-  for(int i = 0; i < fullNameCount; i++)
+  for(int i = 0; i < maps->fullNameCount; i++)
   {
-    ProductionOption* prod = mapFullNameToOption[i];
+    ProductionOption* prod = maps->fullNameToOption[i];
     if(!prod) continue;
     fprintf(file, "\ntypedef struct \n{\n  int type;\n  int nodeCount;\n");
     for(int k = 0; k < prod->stepCount; k++)
@@ -256,90 +268,159 @@ static void generateProductionsHeader(FILE* file, Grammar* grammar, LalrMachine*
       }
       fprintf(file, "  ProductionNode %s%i;\n", stepName, k);
     }
-    fprintf(file, "} %s_%s;\n", namespace, fullNames[i]);
+    fprintf(file, "} %s_%s;\n", namespace, maps->fullNames[i]);
   }
 
   generateHeaderGuardsEnd(file);
-
-  for(int i = 0; i < fullNameCount; i++)
-    if(fullNames[i]) delete(fullNames[i]);
-  delete(mapProdToFullName);
-  delete(mapFullNameToOption);
-  delete(mapOptionToFullName);
-  delete(fullNames);
 }
 
-static void generateProductionsSource(FILE* file, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+static void generateProductionsSource(FILE* file, FullNameMaps* maps, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
 {
-  char** fullNames;
-  int* mapOptionToFullName, *mapProdToFullName;
-  ProductionOption** mapFullNameToOption;
-  int fullNameCount = createProductionFullNameMaps(grammar, &fullNames, &mapProdToFullName, &mapOptionToFullName, &mapFullNameToOption);
-  bool* shouldReduce = new(sizeof(bool)*fullNameCount);
-
   // Visit functions
   char* visitType = "VisitFunction ";
   fprintf(file, "%s%s_visit_defaultFunction = %s_visitNodes;\n\n", visitType, namespace, namespace);
-  for(int i = 0; i < fullNameCount; i++)
-    fprintf(file, "%s%s_visit_%s = nullptr;\n", visitType, namespace, fullNames[i]);
+  for(int i = 0; i < maps->fullNameCount; i++)
+    fprintf(file, "%s%s_visit_%s = nullptr;\n", visitType, namespace, maps->fullNames[i]);
 
   fprintf(
     file, "\nbool %s_visitNodes(Production* production, VisitData* visitData){ return visitNodes(production, visitData, %s_visit);}\n", namespace, namespace);
   
   // Node redundancy table
-  int optionIndex = 0;
-  for(int i = 0; i < grammar->productionCount; i++)
-    for(int j = 0; j < grammar->productions[i].optionCount; j++)
+  fprintf(file, "\nbool %s_nodeRedundancyTable[] = {\n  false, // UNKNOWN\n", namespace);
+  for(int i = 0; i < maps->fullNameCount; i++)
+    if(maps->fullNameToOption[i] != nullptr)
     {
-      ProductionOption* prodOption = &grammar->productions[i].options[j];
-      int reducedIndex = mapOptionToFullName[optionIndex];
-      shouldReduce[reducedIndex] = false;
+      ProductionOption* prodOption = maps->fullNameToOption[i];
+      bool shouldReduce = false;
       if(prodOption->stepCount == 1 && prodOption->steps[0].production)
       {
         ProductionExpr* base = Grammar_getReduced(grammar, &grammar->productions[i]);
         if(!base) base = &grammar->productions[i];
         ProductionExpr* step = Grammar_getReduced(grammar, prodOption->steps[0].production);
         if(!step) step = prodOption->steps[0].production;
-        shouldReduce[reducedIndex] = base == step;
+        shouldReduce = base == step;
       }
-      optionIndex++;
+      fprintf(file, "  %s%s //%s\n", shouldReduce ? "true" : "false", i < maps->fullNameCount -1 ? "," : "", maps->fullNames[i]);
     }
-  
-  fprintf(file, "\nbool %s_nodeRedundancyTable[] = {\n  false, // UNKNOWN\n", namespace);
-  for(int i = 0; i < fullNameCount; i++)
-    if(mapFullNameToOption[i] != nullptr)
-      fprintf(file, "  %s%s //%s\n", shouldReduce[i] ? "true" : "false", i < fullNameCount -1 ? "," : "", fullNames[i]);
+
   fprintf(file, "};\n");
 
   // visit function
   fprintf(file, "\nbool %s_visit(Production* production, VisitData* visitData)\n{\n", namespace);
   fprintf(file, "  %s visitFunction = nullptr;\n  switch(production->type)\n  {\n", visitType);
-  for(int i = 0; i < fullNameCount; i++)
-    if(mapFullNameToOption[i] != nullptr)
-      fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, fullNames[i], namespace, fullNames[i]);
+  for(int i = 0; i < maps->fullNameCount; i++)
+    if(maps->fullNameToOption[i] != nullptr)
+      fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, maps->fullNames[i], namespace, maps->fullNames[i]);
 
   fprintf(file, "  }\n  if(visitFunction != nullptr) return visitFunction(production, visitData);\n\n");
   
   fprintf(file, "  switch(production->type)\n  {\n");
-  for(int i = 0; i < fullNameCount; i++)
-    if(mapFullNameToOption[i] != nullptr)
+  for(int i = 0; i < maps->fullNameCount; i++)
+    if(maps->fullNameToOption[i] != nullptr)
     {
-      char* parentProdFullName = fullNames[mapProdToFullName[mapFullNameToOption[i]->base->index]];
-      fprintf(file, "    case %s_P_%s: visitFunction = %s_visit_%s; break;\n", namespace, fullNames[i], namespace, parentProdFullName);
+      char* parentProdFullName = maps->fullNames[maps->prodToFullName[maps->fullNameToOption[i]->base->index]];
+      fprintf(file, "    case %s_P_%s: visifction = %s_visit_%s; break;\n", namespace, maps->fullNames[i], namespace, parentProdFullName);
     }
   fprintf(file, "  }\n  if(visitFunction != nullptr) return visitFunction(production, visitData);\n\n");
   fprintf(file, "  return %s_visit_defaultFunction(production, visitData);\n}\n\n", namespace);
-
-  for(int i = 0; i < fullNameCount; i++)
-    if(fullNames[i]) delete(fullNames[i]);
-  delete(mapProdToFullName);
-  delete(mapOptionToFullName);
-  delete(mapFullNameToOption);
-  delete(shouldReduce);
-  delete(fullNames);
 }
 
-static void generateParserSource(FILE* file, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+static int reducesWithLookahead(LalrState* state, TokenExpr* token, LalrItem** out)
+{
+  int count = 0;
+  for(int i = 0; i < state->itemCount; i++)
+  {
+    LalrItem* item = &state->items[i];
+    if(item->position >= item->production->stepCount)
+      for(int j = 0; j < item->lookaheadCount; j++)      
+        if(item->lookahead[j] == token)
+        {
+          out[count++] = item;
+          break;
+        }
+  }
+  
+  return count;
+}
+
+static void generateGrammarParser(FILE* file, FullNameMaps* maps, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
+{
+  fprintf(file, "Parser %s_parse(Token* tokens, int productionStructSize)\n{\n", namespace);
+
+  for(int i = 0; i < lalrMachine->stateCount; i++)
+  {
+    int actionCount = 0;
+    LalrState* state = lalrMachine->states[i];
+    fprintf(file, "  Action state%iActions[] = {\n", i);
+    for(int t = 0; t < state->transitionCount; t++)
+    {
+      TokenExpr* token = state->transitions[t].token;
+      if(token)
+      {
+        if(actionCount++ != 0) fprintf(file, ",\n");
+        fprintf(file, "    createShift(%s_T_%s, %i)", namespace, token->name, state->transitions[t].target->index);
+      }
+    }
+    if(state == lalrMachine->acceptedState) fprintf(file, "    createAcceptAction()");
+    else for(int j = 0; j <= grammar->tokenCount; j++)
+    {
+      LalrItem* reductionItems[GRAMMAR_ELEMENTS_MAX];
+      TokenExpr* token = (j < grammar->tokenCount) ? &grammar->tokens[j] : nullptr;
+      int reductionCount = reducesWithLookahead(state, token, reductionItems);
+      if(reductionCount > 0)
+      {
+        if(actionCount++ != 0) fprintf(file, ",\n");
+        char* tokenName = token != nullptr ? token->name : "END_OF_FILE";
+        fprintf(file, "    createReduce%i(%s_T_%s", reductionCount, namespace, tokenName);
+        for(int k = 0; k < reductionCount; k++)
+        {
+          int fullNameLength = getProductionFullName(reductionItems[k]->production, grammar, nullptr);
+          char fullName[fullNameLength];
+          getProductionFullName(reductionItems[k]->production, grammar, fullName);
+          fprintf(file, ", %i, %s_P_%s, %i", reductionItems[k]->production->base->index, namespace, fullName, reductionItems[k]->production->stepCount);
+        }
+        fprintf(file, ")");
+      }
+    }
+    
+    fprintf(file, "\n  };\n");
+  }
+
+  fprintf(file, "  State states[] = {\n");
+
+  for(int i = 0; i < lalrMachine->stateCount; i++)
+  {
+    if(i != 0) fprintf(file, ",\n");
+    fprintf(file, "    createState(state%iActions, sizeof(state%iActions)/sizeof(Action))", i, i);
+  }
+
+  fprintf(file, "\n  };\n  return parse(states, goToTable, token, productionStructSize);\n}\n");
+}
+
+static void generateGotoTable(FILE* file, LalrMachine* lalrMachine)
+{
+  fprintf(file, "static int goToTable(int state, int productionIndex)\n{\n");
+  fprintf(file, "  switch(state)\n  {\n");
+  for(int i = 0; i < lalrMachine->stateCount; i++)
+  {
+    LalrState* state = lalrMachine->states[i];
+    if(state->transitionCount == 0) continue;
+    fprintf(file, "    case %i:\n", i);
+    fprintf(file, "    switch(productionIndex)\n    {\n");
+    for(int j = 0; j < state->transitionCount; j++)
+    {
+      LalrTransition* transition = &state->transitions[j];
+      if(transition->production)
+        fprintf(file, "      case %i: return %i;\n", transition->production->index, transition->target->index);
+    }
+    fprintf(file, "    }\n");
+    fprintf(file, "    break;\n");
+  }
+  fprintf(file, "  }\n");
+  fprintf(file, "}\n\n");
+}
+
+static void generateParserSource(FILE* file, FullNameMaps* maps, Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
 {
   generatedFileDisclaimer(file);
 
@@ -348,7 +429,9 @@ static void generateParserSource(FILE* file, Grammar* grammar, LalrMachine* lalr
   fprintf(file, "#include \"%s/parsers/productions.h\"\n", namespace);
   
   generateLexerSource(file, grammar, namespace);
-  generateProductionsSource(file, grammar, lalrMachine, namespace);
+  generateProductionsSource(file, maps, grammar, lalrMachine, namespace);
+  generateGotoTable(file, lalrMachine);
+  generateGrammarParser(file, maps, grammar, lalrMachine, namespace);
 }
 
 bool generateGrammar(Grammar* grammar, LalrMachine* lalrMachine, char* namespace)
@@ -363,20 +446,31 @@ bool generateGrammar(Grammar* grammar, LalrMachine* lalrMachine, char* namespace
   createDirectory(baseOutputPath);
   createDirectory(finalBasePath);
 
-  FILE* file = createFile(finalBasePath, "parser.h");
-  if(!file) return false;
-  generateParserHeader(file, grammar, namespace);
-  closeFile(file);
+  FullNameMaps maps = createProductionFullNameMaps(grammar);
 
+  FILE* file = createFile(finalBasePath, "parser.h");
+  
+  if(file)
+  {
+    generateParserHeader(file, grammar, namespace);  
+    closeFile(file);
+  }
+  
   file = createFile(finalBasePath, "productions.h");
-  if(!file) return false;
-  generateProductionsHeader(file, grammar, lalrMachine, namespace);
-  closeFile(file);
+  if(file)
+  {
+    generateProductionsHeader(file, &maps, grammar, lalrMachine, namespace);
+    closeFile(file);
+  }
 
   file = createFile(finalBasePath, "parser.c");
-  if(!file) return false;
-  generateParserSource(file, grammar, lalrMachine, namespace);
-  closeFile(file);
+  if(file)
+  {
+    generateParserSource(file, &maps, grammar, lalrMachine, namespace);
+    closeFile(file);
+  }
+
+  clearFullNameMaps(&maps);
 
   return true;
 }

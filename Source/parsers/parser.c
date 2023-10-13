@@ -5,6 +5,14 @@
 #include "parsers/parser.h"
 #include "parsers/lexer.h"
 
+#ifdef _MALLOC
+#define new _MALLOC
+#define delete _FREE
+#else
+#define new malloc
+#define delete free
+#endif
+
 void* new(long long size);
 void delete(void* p);
 

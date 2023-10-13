@@ -1,6 +1,6 @@
 CC=gcc
 CXX=g++
-C_FLAGS=-fPIC -g
+C_FLAGS=-fPIC -g -D _MALLOC=new -D _FREE=delete
 INCLUDE_PATH=-I. -ISource
 DIRS=$(shell find Source/ -type d)
 C_SOURCES=$(shell find Source/ -type f -iname "*.c")
