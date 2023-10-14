@@ -36,8 +36,6 @@ int compile(Grammar* grammar, char* fileContent)
   return OK;
 }
 
-int mainOld(int numArgs, char** args);
-
 static void nextToken(Grammar* grammar, char* content, int startIndex, int length, Token* ret)
 {
   memset(ret, 0, sizeof(Token));
@@ -132,7 +130,6 @@ int checkCliCommands(int numArgs, char** args, Grammar* grammar, LalrMachine* la
 
 int main(int numArgs, char** args)
 {
-  //return mainOld(numArgs, args);
   if(numArgs < 3) return showHelp();
 
   char* fileContent = readFile(args[1]);
