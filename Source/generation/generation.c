@@ -7,6 +7,14 @@
 static char* generationPath = "output/";
 static char* baseOutputPath = "output/parsers/";
 static char* linkToRepo = "https://github.com/ClaudioMota/UCC";
+static char* templatesPath = "./Source/parsers/";
+
+static char* templates[] = {
+  "parser.c",
+  "parser.h",
+  "lexer.c",
+  "lexer.h"
+};
 
 typedef struct
 {
@@ -473,6 +481,15 @@ bool generateGrammar(Grammar* grammar, LalrMachine* lalrMachine, char* namespace
   }
 
   clearFullNameMaps(&maps);
+
+  for(int i = 0; i < sizeof(templates)/sizeof(char*); i++)
+  {
+    strcpy(finalBasePath, templatesPath);
+    strcat(finalBasePath, templates[i]);
+    if(!copyFile(finalBasePath, baseOutputPath, templates[i]))
+      return compilerError("Could not copy template file", nullptr);
+  }
+  
 
   return true;
 }
