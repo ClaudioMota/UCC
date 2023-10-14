@@ -37,7 +37,7 @@ bool Grammar_load(Grammar* grammar, char* content)
   Lexer_parse(&lexer, content);
 
   ProductionContainer allProductions = createProductionContainer(sizeof(UCCProduction));
-  Parser parser = ucc_parse(&allProductions, lexer.tokens);
+  Parser parser = ucc_parse(lexer.tokens, &allProductions, sizeof(UCCProduction));
 
   if(!parser.hasError)
   {

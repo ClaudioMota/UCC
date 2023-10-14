@@ -294,8 +294,8 @@ static void generateProductionsSource(FILE* file, FullNameMaps* maps, Grammar* g
       bool shouldReduce = false;
       if(prodOption->stepCount == 1 && prodOption->steps[0].production)
       {
-        ProductionExpr* base = Grammar_getReduced(grammar, &grammar->productions[i]);
-        if(!base) base = &grammar->productions[i];
+        ProductionExpr* base = Grammar_getReduced(grammar, prodOption->base);
+        if(!base) base = prodOption->base;
         ProductionExpr* step = Grammar_getReduced(grammar, prodOption->steps[0].production);
         if(!step) step = prodOption->steps[0].production;
         shouldReduce = base == step;

@@ -54,7 +54,9 @@ static Production* createProduction(ProductionContainer* productionContainer)
 {
   if(productionContainer->currentContainerIndex >= CONTAINER_MAX_PRODUCTIONS)
   {
-    productionContainer->containers[productionContainer->containerCount++] = new(productionContainer->productionStructSize * CONTAINER_MAX_PRODUCTIONS);
+    void* alloc = new(productionContainer->productionStructSize * CONTAINER_MAX_PRODUCTIONS);
+    memset(alloc, 0, productionContainer->productionStructSize * CONTAINER_MAX_PRODUCTIONS);
+    productionContainer->containers[productionContainer->containerCount++] = alloc;
     productionContainer->currentContainerIndex = 0;
   }
   char* productions = productionContainer->containers[productionContainer->containerCount-1];

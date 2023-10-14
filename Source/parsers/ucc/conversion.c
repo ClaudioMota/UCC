@@ -205,6 +205,7 @@ static bool visitToken(UCCProduction* production, VisitData* visitData)
     if(!decl) return compilerError("Could not declare token", token);
 
     StateMachineState* last = createStateMachineStates(production->nodes[offset + 2].production, &decl->stateMachine, decl->stateMachine.start);
+    if(!last) return compilerError("State machine states creating states", token);
     last->accepted = true;
   }
 

@@ -45,7 +45,7 @@ bool ucc_visit(Production* production, VisitData* visitData);
 bool ucc_visitNodes(Production* production, VisitData* visitData);
 extern bool ucc_nodeRedundancyTable[];
 
-Parser ucc_parse(ProductionContainer* allProductions, Token* tokens);
+Parser ucc_parse(Token* tokens, ProductionContainer* productionContainer, int productionStructSize);
 
 #ifdef __cplusplus
 }
