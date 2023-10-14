@@ -3,7 +3,7 @@
 
 #include "parsers/lexer.h"
 #include "parsers/parser.h"
-#include "parsers/ucc/uccParser.h"
+#include "parsers/ucc/parser.h"
 #include "parsers/ucc/productions.h"
 static int func_identifier(int* state, int input)
 {
