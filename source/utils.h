@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define VERSION "1.0"
 #define GRAMMAR_ELEMENTS_MAX 1024
 #define SUPPORTED_CHARACTERS 256
 #define STRING_LENGTH 64

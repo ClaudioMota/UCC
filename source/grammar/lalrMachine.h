@@ -1,7 +1,7 @@
 #ifndef LALR_HEADER
 #define LALR_HEADER 1
 
-#include "basics.h"
+#include "utils.h"
 #include "grammar/grammar.h"
 
 typedef struct LalrItem LalrItem;

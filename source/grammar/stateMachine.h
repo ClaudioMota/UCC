@@ -1,7 +1,7 @@
 #ifndef STATE_MACHINE_HEADER
 #define STATE_MACHINE_HEADER 1
 
-#include "basics.h"
+#include "utils.h"
 #include <stdbool.h>
 
 typedef struct StateMachine StateMachine;

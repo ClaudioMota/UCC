@@ -1,6 +1,6 @@
 #include "grammar/lalrMachine.h"
 
-#include "basics.h"
+#include "utils.h"
 #include "grammar/grammar.h"
 #include <string.h>
 #include <stdio.h>
