@@ -7,7 +7,7 @@
 static char* generationPath = "output/";
 static char* baseOutputPath = "output/parsers/";
 static char* linkToRepo = "https://github.com/ClaudioMota/UCC";
-static char* templatesPath = "./Source/parsers/";
+static char* templatesPath = "./source/parsers/";
 
 static char* templates[] = {
   "parser.c",
