@@ -87,15 +87,6 @@ char* getStringActualContent(char* ret, char* data)
   return ret;
 }
 
-
-int mkdir(char*, int);
-
-// TODO multiplatform
-bool createDirectory(char* path)
-{
-  return mkdir(path, 0777) == 0;
-}
-
 FILE* createFile(char* basePath, char* fileName)
 {
   char fullPath[STRING_LENGTH*3];

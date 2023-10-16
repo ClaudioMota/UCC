@@ -7,10 +7,10 @@ C_SOURCES=$(shell find source/ -type f -iname "*.c")
 C_OBJECTS=$(foreach x, $(basename $(C_SOURCES)), build/$(x).o)
 
 TARGET=Linux64
-LINK= -static-libstdc++ -static-libgcc -static
+LINK= -static-libgcc -static
 
-all: build $(C_OBJECTS) $(CPP_OBJECTS)
-	g++ $(C_OBJECTS) $(CPP_OBJECTS) $(LINK) -o build/ucc
+all: build $(C_OBJECTS)
+	g++ $(C_OBJECTS) $(LINK) -o build/ucc
 
 clean:
 	rm -r build

@@ -254,10 +254,12 @@ static int getProdPossibility(Production* expr, int index, char** steps, int ste
       strcpy(steps[stepIndex++], expr->nodes[0].token->content);
     break;
     case ucc_P_Expr_Expr_Expr:
+    {
       int nextIndex = index;
       if(expr->nodes[1].production->type == ucc_P_Expr_Expr_Op) nextIndex >>= 1;
       stepIndex = getProdPossibility(expr->nodes[0].production, nextIndex, steps, stepIndex);
       stepIndex = getProdPossibility(expr->nodes[1].production, index, steps, stepIndex);
+    }
     break;
   }
 
