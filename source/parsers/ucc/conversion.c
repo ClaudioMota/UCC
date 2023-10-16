@@ -104,7 +104,7 @@ static bool visitExpr(Production* production, VisitData* visitData)
   switch(visitData->mode)
   {
     case MODE_HELPER: calcHelperValue(uccProduction(production)); break;
-    default:
+    default: break;
   }
 
   return ret;
@@ -190,6 +190,8 @@ static StateMachineState* createStateMachineStates(Production* expr, StateMachin
     case ucc_P_Expr_o_parentheses_Expr_c_parentheses:
       return createStateMachineStates(expr->nodes[1].production, stateMachine, current);
   }
+
+  return nullptr;
 }
 
 static bool visitToken(UCCProduction* production, VisitData* visitData)

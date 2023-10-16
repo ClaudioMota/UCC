@@ -327,11 +327,13 @@ static inline bool isRelevantToken(Token* token)
   return !token->ignored;
 }
 
+#ifdef SHOW_GRAMMAR_STACK
 static void showGrammarStack(Parser* parser)
 {
   int aux = parser->pos;
   while(aux){ printf("->%i\n", parser->stateStack[aux--]); }
 }
+#endif
 
 static Parser* getMainErrorParser(Parser* parser)
 {
@@ -385,7 +387,6 @@ bool reduceNodes(Production* production, bool* nodeRedundancyTable)
 
 int getProductionList(Production* production, Production** outList)
 {
-  bool recursion = false;
   int numProds = 0;
 
   int currentIndex = 0;
@@ -403,6 +404,7 @@ int getProductionList(Production* production, Production** outList)
     {
       Production* prod = production->nodes[i].production;
       if(prod)
+      {
         if(prod->type == production->type)
           currentIndex = getProductionList(prod, outList);
         else
@@ -410,6 +412,7 @@ int getProductionList(Production* production, Production** outList)
           if(outList != nullptr) outList[currentIndex] = prod;
           currentIndex++;
         }
+      }
     }
 
   return currentIndex;

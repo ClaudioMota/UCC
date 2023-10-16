@@ -184,8 +184,7 @@ static void replaceWithDeterministicStates(StateMachine* stateMachine, CompoundS
       {
         int s = map[deterministicStates[i].index];
         CompoundTransition* ct = &deterministicStates[i].transitions[j];
-        StateMachineTransition* transition =
-          StateMachine_addTransition(stateMachine, stateMachine->states[s], stateMachine->states[map[ct->target->index]], ct->value);
+        StateMachine_addTransition(stateMachine, stateMachine->states[s], stateMachine->states[map[ct->target->index]], ct->value);
       }
   }
 

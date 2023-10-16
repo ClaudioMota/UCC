@@ -383,7 +383,7 @@ static void generateGrammarParser(FILE* file, FullNameMaps* maps, Grammar* gramm
         for(int k = 0; k < reductionCount; k++)
         {
           int fullNameLength = getProductionFullName(reductionItems[k]->production, grammar, nullptr);
-          char fullName[fullNameLength];
+          char fullName[fullNameLength + 1];
           getProductionFullName(reductionItems[k]->production, grammar, fullName);
           fprintf(file, ", %i, %s_P_%s, %i", reductionItems[k]->production->base->index, namespace, fullName, reductionItems[k]->production->stepCount);
         }
@@ -425,7 +425,7 @@ static void generateGotoTable(FILE* file, LalrMachine* lalrMachine)
     fprintf(file, "    }\n");
     fprintf(file, "    break;\n");
   }
-  fprintf(file, "  }\n");
+  fprintf(file, "  }\n  return -1;\n");
   fprintf(file, "}\n\n");
 }
 

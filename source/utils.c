@@ -43,6 +43,8 @@ bool compilerError(char* message, Token* location)
     printf("%s %i:%i\n", message, location->line, location->column);
   else
     printf("%s\n", message);
+
+  return false;
 }
 
 bool failIfNull(void* pointer, char* errorMessage)
@@ -75,7 +77,6 @@ char* getStringActualContent(char* ret, char* data)
         case 'a': escaped = '\a'; break;
         default: escaped = data[i];
       }
-
       ret[o++] = escaped;
     }
     else
