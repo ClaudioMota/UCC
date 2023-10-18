@@ -1,5 +1,5 @@
 CC=gcc
-C_FLAGS=-Wall -fPIC -g -D _MALLOC=new -D _FREE=delete
+C_FLAGS=-Wall -Werror -fPIC -g -D _MALLOC=new -D _FREE=delete
 INCLUDE_PATH=-I. -Isource
 DIRS=$(shell find source/ -type d)
 TEST_DIRS=$(shell find tests/ -type d)
